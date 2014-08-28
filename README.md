@@ -61,7 +61,7 @@ var helpers = new Helpers();
 
 Set helpers on the cache.
 
-### [.get](index.js#L62)
+### [.get](index.js#L59)
 
 * `key` **{String}**: The helper to get.    
 * `returns` **{Object}**: The specified helper. If no `key` is passed, the entire cache is returned.  
