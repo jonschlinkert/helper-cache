@@ -11,6 +11,26 @@ var _ = require('lodash');
 
 
 /**
+ * Utility method to define getters.
+ *
+ * @param  {Object} `obj`
+ * @param  {String} `name`
+ * @param  {Function} `getter`
+ * @return {Getter}
+ * @api private
+ */
+
+function defineGetter(obj, name, getter) {
+  Object.defineProperty(obj, name, {
+    configurable: false,
+    enumerable: false,
+    get: getter,
+    set: function() {}
+  });
+}
+
+
+/**
  * ```js
  * var Helpers = require('helper-cache');
  * var helpers = new Helpers();
@@ -22,7 +42,11 @@ var _ = require('lodash');
  */
 
 function Helpers (options) {
-  this.options = options || {bindFunctions: false};
+  options = options || {bindFunctions: false};
+
+  defineGetter(this, 'options', function () {
+    return options;
+  });
 }
 
 
@@ -34,18 +58,20 @@ function Helpers (options) {
  * @api public
  */
 
-Helpers.prototype.set = function(key, fn) {
-  if (typeof key !== 'string') {
-    this.keyend(key);
-  } else {
-    if (this.options.bindFunctions) {
-      this[key] = _.bind(fn, this);
+defineGetter(Helpers.prototype, 'set', function () {
+  return function (key, fn, thisArg) {
+    if (typeof key !== 'string') {
+      this.keyend(key);
     } else {
-      this[key] = fn;
+      if (this.options.bindFunctions) {
+        this[key] = _.bind(fn, thisArg || this);
+      } else {
+        this[key] = fn;
+      }
     }
-  }
-  return this;
-};
+    return this;
+  }.bind(this);
+});
 
 
 /**
@@ -56,12 +82,14 @@ Helpers.prototype.set = function(key, fn) {
  * @api public
  */
 
-Helpers.prototype.get = function(key) {
-  if (!key) {
-    return this;
-  }
-  return this[key];
-};
+defineGetter(Helpers.prototype, 'get', function () {
+  return function(key) {
+    if (!key) {
+      return this;
+    }
+    return this[key];
+  }.bind(this);
+});
 
 
 module.exports = Helpers;
