@@ -38,9 +38,6 @@ Helpers.prototype.set = function(key, fn) {
   if (typeof key !== 'string') {
     this.keyend(key);
   } else {
-    if (key[0] !== '.') {
-      key = '.' + key;
-    }
     if (this.options.bindFunctions) {
       this[key] = _.bind(fn, this);
     } else {
@@ -63,11 +60,6 @@ Helpers.prototype.get = function(key) {
   if (!key) {
     return this;
   }
-
-  if (key[0] !== '.') {
-    key = '.' + key;
-  }
-
   return this[key];
 };
 
