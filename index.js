@@ -43,6 +43,9 @@ function defineGetter(obj, name, getter) {
  */
 
 function Helpers (options) {
+  if (!(this instanceof Helpers)) {
+    return new Helpers(options);
+  }
   options = options || {bindFunctions: false};
   defineGetter(this, 'options', function () {
     return options;
@@ -61,7 +64,7 @@ function Helpers (options) {
 defineGetter(Helpers.prototype, 'addHelper', function () {
   return function (key, fn, thisArg) {
     if (typeof key !== 'string') {
-      this.keyend(key);
+      _.extend(this, key);
     } else {
       if (this.options.bindFunctions) {
         this[key] = _.bind(fn, thisArg || this);
