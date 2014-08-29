@@ -42,13 +42,18 @@ function defineGetter(obj, name, getter) {
  * @api public
  */
 
-function Helpers (options) {
+function Helpers(options) {
   if (!(this instanceof Helpers)) {
     return new Helpers(options);
   }
-  options = options || {bindFunctions: false};
+
+  var opts = _.defaults({}, options, {
+    bindFunctions: false,
+    thisArg: this
+  });
+
   defineGetter(this, 'options', function () {
-    return options;
+    return opts;
   });
 }
 
@@ -63,15 +68,18 @@ function Helpers (options) {
 
 defineGetter(Helpers.prototype, 'addHelper', function () {
   return function (key, fn, thisArg) {
+    thisArg = thisArg || this.options.thisArg;
+
     if (typeof key !== 'string') {
       _.extend(this, key);
     } else {
       if (this.options.bindFunctions) {
-        this[key] = _.bind(fn, thisArg || this);
+        this[key] = _.bind(fn, thisArg);
       } else {
         this[key] = fn;
       }
     }
+
     return this;
   }.bind(this);
 });
@@ -89,7 +97,17 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 
 defineGetter(Helpers.prototype, 'addHelpers', function () {
   return function () {
-    _.extend(this, loader.load.apply(loader, arguments).cache);
+    var thisArg = this.options.thisArg;
+
+    loader.init();
+
+    var helpers = loader.load.apply(loader, arguments);
+    _.forIn(helpers.cache, function (value, key) {
+      var o = {};
+      o[key] = _.bind(value, thisArg);
+      _.extend(this, o);
+    }, this);
+
     return this;
   }.bind(this);
 });
@@ -103,7 +121,7 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'get', function () {
+defineGetter(Helpers.prototype, 'getHelper', function () {
   return function(key) {
     if (!key) {
       return this;
