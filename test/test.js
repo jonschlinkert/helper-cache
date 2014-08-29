@@ -37,4 +37,30 @@ describe('helperCache', function () {
     assert(helpers.foo);
     assert(helpers.bar);
   });
+
+  it('should get a helper by name', function () {
+    var helpers = helperCache();
+    helpers.set('foo', function (str) {
+      return str + ' foo';
+    });
+    var foo = helpers.get('foo');
+    assert(foo);
+  });
+
+  it('should get all helpers as object', function () {
+    var helpers = helperCache();
+    helpers.set({
+      foo: function (str) {
+        return str + ' foo';
+      },
+      bar: function (str) {
+        return str + ' bar';
+      }
+    });
+
+    var obj = helpers.get();
+    assert(obj.foo);
+    assert(obj.bar);
+  });
+
 });
