@@ -42,6 +42,9 @@ function defineGetter(obj, name, getter) {
  */
 
 function Helpers (options) {
+  if (!(this instanceof Helpers)) {
+    return new Helpers(options);
+  }
   options = options || {bindFunctions: false};
 
   defineGetter(this, 'options', function () {
