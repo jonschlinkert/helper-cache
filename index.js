@@ -64,7 +64,7 @@ function Helpers (options) {
 defineGetter(Helpers.prototype, 'set', function () {
   return function (key, fn, thisArg) {
     if (typeof key !== 'string') {
-      this.keyend(key);
+      _.extend(this, key);
     } else {
       if (this.options.bindFunctions) {
         this[key] = _.bind(fn, thisArg || this);
