@@ -1,12 +1,18 @@
 {
   "name": "helper-cache",
   "description": "Easily get and set helper functions to pass to any application or template engine.",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
   "author": {
     "name": "Jon Schlinkert",
     "url": "https://github.com/jonschlinkert"
   },
+  "maintainers": [
+    {
+      "name": "Brian Woodward",
+      "url": "https://github.com/doowb"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/jonschlinkert/helper-cache.git"
@@ -35,9 +41,28 @@
     "verb-tag-jscomments": ">= 0.2.0"
   },
   "keywords": [
+    "assemble",
     "cache",
+    "compile",
+    "consolidate",
+    "content",
+    "data",
+    "delimiters",
+    "delims",
+    "docs",
+    "documentation",
+    "engine",
+    "express",
+    "helper",
     "helpers",
-    "helper"
+    "lo-dash",
+    "lodash",
+    "process",
+    "render",
+    "templates",
+    "underscore",
+    "verb",
+    "yaml"
   ],
   "dependencies": {
     "load-helpers": "^0.1.0"

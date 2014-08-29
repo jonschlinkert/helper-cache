@@ -66,11 +66,17 @@ See [load-helpers] for issues, API details and the full range of options.
 Get a helper from the cache.
 
 ## Author
-
+ 
 **Jon Schlinkert**
  
 + [github/jonschlinkert](https://github.com/jonschlinkert)
 + [twitter/jonschlinkert](http://twitter.com/jonschlinkert) 
+ 
+**Brian Woodward**
+ 
++ [github/doowb](https://github.com/doowb)
++ [twitter/doowb](http://twitter.com/doowb) 
+
 
 ## License
 Copyright (c) 2014 Jon Schlinkert, contributors.  
