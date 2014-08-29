@@ -7,6 +7,7 @@
 
 'use strict';
 
+var loader = require('load-helpers');
 var _ = require('lodash');
 
 
@@ -43,7 +44,6 @@ function defineGetter(obj, name, getter) {
 
 function Helpers (options) {
   options = options || {bindFunctions: false};
-
   defineGetter(this, 'options', function () {
     return options;
   });
@@ -58,7 +58,7 @@ function Helpers (options) {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'set', function () {
+defineGetter(Helpers.prototype, 'addHelper', function () {
   return function (key, fn, thisArg) {
     if (typeof key !== 'string') {
       this.keyend(key);
@@ -69,6 +69,24 @@ defineGetter(Helpers.prototype, 'set', function () {
         this[key] = fn;
       }
     }
+    return this;
+  }.bind(this);
+});
+
+
+/**
+ * Add an object of helpers to the cache.
+ *
+ * See [load-helpers] for issues, API details and the full range of options.
+ *
+ * @param {String} `key` The name of the helper.
+ * @param {Function} `fn` Helper function.
+ * @api public
+ */
+
+defineGetter(Helpers.prototype, 'addHelpers', function () {
+  return function () {
+    _.extend(this, loader.load.apply(loader, arguments).cache);
     return this;
   }.bind(this);
 });
