@@ -1,7 +1,7 @@
 {
   "name": "helper-cache",
   "description": "Easily get and set helper functions to pass to any application or template engine.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
   "author": {
     "name": "Jon Schlinkert",
