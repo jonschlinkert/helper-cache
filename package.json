@@ -65,6 +65,7 @@
     "yaml"
   ],
   "dependencies": {
-    "load-helpers": "^0.1.0"
+    "load-helpers": "^0.1.0",
+    "randomatic": "^0.1.4"
   }
 }

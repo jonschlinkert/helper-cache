@@ -8,6 +8,7 @@
 'use strict';
 
 var loader = require('load-helpers');
+var rand = require('randomatic');
 var _ = require('lodash');
 
 
@@ -55,6 +56,14 @@ function Helpers(options) {
   defineGetter(this, 'options', function () {
     return opts;
   });
+
+  var obj = {
+    helpersAsync: {},
+    waiting: []
+  };
+  defineGetter(this, '_', function () {
+    return obj;
+  });
 }
 
 
@@ -82,6 +91,36 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 
     return this;
   }.bind(this);
+});
+
+
+/**
+ * Set async helpers on the cache.
+ *
+ * @param {String} `key` The name of the helper.
+ * @param {Function} `fn` Helper function.
+ * @api public
+ */
+
+defineGetter(Helpers.prototype, 'addHelperAsync', function () {
+  return function(key, fn, thisArg) {
+    thisArg = thisArg || this.options.thisArg;
+    if (typeof key !== 'string') {
+      _.forOwn(key, function (value, k) {
+        this.addHelperAsync(k, value, thisArg);
+      }, this);
+    } else {
+      var self = this;
+      this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+      this.addHelper(key, function () {
+        var id = '__async_helper_id__' + rand('Aa0', 42) + '__';
+        var args = [].slice.call(arguments);
+        self._.waiting.push({id: id, key: key, args: args});
+        return id;
+      });
+    }
+    return this;
+  }
 });
 
 
@@ -114,6 +153,26 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
 
 
 /**
+ * Add an object of async helpers to the cache.
+ *
+ * See [load-helpers] for issues, API details and the full range of options.
+ *
+ * @param {String} `key` The name of the helper.
+ * @param {Function} `fn` Helper function.
+ * @api public
+ */
+
+defineGetter(Helpers.prototype, 'addHelpersAsync', function () {
+  return function () {
+    var thisArg = this.options.thisArg;
+    loader.init();
+    var helpers = loader.load.apply(loader, arguments);
+    return this.addHelperAsync(helpers.cache);
+  }.bind(this);
+});
+
+
+/**
  * Get a helper from the cache.
  *
  * @param  {String} `key` The helper to get.
@@ -130,5 +189,51 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
   }.bind(this);
 });
 
+/**
+ * Get an async helper from the cache.
+ *
+ * @param  {String} `key` The helper to get.
+ * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
+ * @api public
+ */
+
+defineGetter(Helpers.prototype, 'getHelperAsync', function () {
+  return function(key) {
+    if (!key) {
+      return this._.helpersAsync;
+    }
+    return this._.helpersAsync[key];
+  }.bind(this);
+});
+
+defineGetter(Helpers.prototype, 'resolve', function () {
+  return function (content, cb) {
+    var self = this;
+    var next = function (i, callback) {
+      // current helper info
+      var helper = self._.waiting[i];
+
+      if (helper) {
+        // original async helper
+        var fn = self.getHelperAsync(helper.key);
+        if (!fn) return next(i+1, callback);
+
+        // call the async helper and replace id with results
+        var args = helper.args || [];
+        args.push(function (err, results) {
+          content = content.replace(helper.id, results);
+          next(i+1, callback);
+        });
+        fn.apply(self, args);
+
+      } else {
+        self._.waiting = [];
+        // call final callback
+        callback(null, content);
+      }
+    }
+    next(0, cb.bind(self));
+  };
+});
 
 module.exports = Helpers;
