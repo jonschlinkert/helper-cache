@@ -209,30 +209,36 @@ defineGetter(Helpers.prototype, 'getHelperAsync', function () {
 defineGetter(Helpers.prototype, 'resolve', function () {
   return function (content, cb) {
     var self = this;
-    var next = function (i, callback) {
+    var i = 0;
+    var next = function (err, content) {
       // current helper info
-      var helper = self._.waiting[i];
+      var helper = self._.waiting[i++];
 
       if (helper) {
         // original async helper
         var fn = self.getHelperAsync(helper.key);
-        if (!fn) return next(i+1, callback);
+        if (!fn) return next(null, content);
+        if (content.indexOf(helper.id) === -1) {
+          return next(null, content);
+        }
 
         // call the async helper and replace id with results
         var args = helper.args || [];
-        args.push(function (err, results) {
+        var nextCallback = function (err, results) {
           content = content.replace(helper.id, results);
-          next(i+1, callback);
-        });
+          next(null, content);
+        };
+        if (args[args.length-1].toString() !== nextCallback.toString()) {
+          args.push(nextCallback);
+        }
         fn.apply(self, args);
 
       } else {
-        self._.waiting = [];
         // call final callback
-        callback(null, content);
+        return cb(null, content);
       }
     }
-    next(0, cb.bind(self));
+    return next(null, content);
   };
 });
 
