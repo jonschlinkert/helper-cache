@@ -111,7 +111,11 @@ defineGetter(Helpers.prototype, 'addHelperAsync', function () {
       }, this);
     } else {
       var self = this;
-      this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+      if (this.options.bindFunctions) {
+        this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+      } else {
+        this._.helpersAsync[key] = fn;
+      }
       this.addHelper(key, function () {
         var id = '__async_helper_id__' + rand('Aa0', 42) + '__';
         var args = [].slice.call(arguments);
@@ -143,7 +147,11 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
     var helpers = loader.load.apply(loader, arguments);
     _.forIn(helpers.cache, function (value, key) {
       var o = {};
-      o[key] = _.bind(value, thisArg);
+      if (this.options.bindFunctions) {
+        o[key] = _.bind(value, thisArg);
+      } else {
+        o[key] = value;
+      }
       _.extend(this, o);
     }, this);
 
