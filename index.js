@@ -214,6 +214,23 @@ defineGetter(Helpers.prototype, 'getHelperAsync', function () {
   }.bind(this);
 });
 
+
+/**
+ * Resolve async helpers to replace the generated id with the actual value.
+ *
+ * **Example**
+ *
+ * ```js
+ * helpers.resolve(str, function (err, content) {
+ *   // do something with finaly contents
+ * });
+ * ```
+ * 
+ * @param {String} `content` Content that was originally rendered and may have async helper IDs.
+ * @param {Function} `cb` Callback that will return the final contents after all async helpers have been resolved.
+ * @api public
+ */
+
 defineGetter(Helpers.prototype, 'resolve', function () {
   return function (content, cb) {
     var self = this;
