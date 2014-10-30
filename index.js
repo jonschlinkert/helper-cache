@@ -111,11 +111,15 @@ defineGetter(Helpers.prototype, 'addHelperAsync', function () {
       }, this);
     } else {
       var self = this;
-      this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+      if (this.options.bindFunctions) {
+        this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+      } else {
+        this._.helpersAsync[key] = fn;
+      }
       this.addHelper(key, function () {
         var id = '__async_helper_id__' + rand('Aa0', 42) + '__';
         var args = [].slice.call(arguments);
-        self._.waiting.push({id: id, key: key, args: args});
+        self._.waiting.push({id: id, key: key, args: args, fn: fn.bind(this)});
         return id;
       });
     }
@@ -143,7 +147,11 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
     var helpers = loader.load.apply(loader, arguments);
     _.forIn(helpers.cache, function (value, key) {
       var o = {};
-      o[key] = _.bind(value, thisArg);
+      if (this.options.bindFunctions) {
+        o[key] = _.bind(value, thisArg);
+      } else {
+        o[key] = value;
+      }
       _.extend(this, o);
     }, this);
 
@@ -216,7 +224,9 @@ defineGetter(Helpers.prototype, 'resolve', function () {
 
       if (helper) {
         // original async helper
-        var fn = self.getHelperAsync(helper.key);
+        // var fn = self.getHelperAsync(helper.key);
+        var fn = helper.fn;
+
         if (!fn) return next(null, content);
         if (content.indexOf(helper.id) === -1) {
           return next(null, content);
@@ -231,7 +241,8 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         if (args[args.length-1].toString() !== nextCallback.toString()) {
           args.push(nextCallback);
         }
-        fn.apply(self, args);
+
+        fn.apply(fn, args);
 
       } else {
         // call final callback

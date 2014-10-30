@@ -33,6 +33,10 @@
   "scripts": {
     "test": "mocha -R spec"
   },
+  "dependencies": {
+    "load-helpers": "^0.1.0",
+    "randomatic": "^0.1.4"
+  },
   "devDependencies": {
     "lodash": "^2.4.1",
     "mocha": "*",
@@ -63,9 +67,5 @@
     "underscore",
     "verb",
     "yaml"
-  ],
-  "dependencies": {
-    "load-helpers": "^0.1.0",
-    "randomatic": "^0.1.4"
-  }
+  ]
 }
