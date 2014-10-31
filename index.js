@@ -40,6 +40,7 @@ function defineGetter(obj, name, getter) {
  *
  * @param {Object} `options` Default options to use.
  *   @option {Boolean} [options] `bindFunctions` Bind functions to `this`. Defaults to `false`.
+ *   @option {Boolean} [options] `thisArg` The context to use.
  * @api public
  */
 
@@ -57,10 +58,7 @@ function Helpers(options) {
     return opts;
   });
 
-  var obj = {
-    helpersAsync: {},
-    waiting: []
-  };
+  var obj = {helpersAsync: {}, waiting: []};
   defineGetter(this, '_', function () {
     return obj;
   });
@@ -88,7 +86,6 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
         this[key] = fn;
       }
     }
-
     return this;
   }.bind(this);
 });
@@ -214,6 +211,15 @@ defineGetter(Helpers.prototype, 'getHelperAsync', function () {
   }.bind(this);
 });
 
+/**
+ * Getter method to resolve async helper values that were called during
+ * the render process.
+ *
+ * @param {String} `content` Rendered string containing async ids
+ * @param {Function} `cb`
+ * @api public
+ */
+
 defineGetter(Helpers.prototype, 'resolve', function () {
   return function (content, cb) {
     var self = this;
@@ -224,7 +230,6 @@ defineGetter(Helpers.prototype, 'resolve', function () {
 
       if (helper) {
         // original async helper
-        // var fn = self.getHelperAsync(helper.key);
         var fn = helper.fn;
 
         if (!fn) return next(null, content);
