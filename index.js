@@ -1,45 +1,28 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Copyright (c) 2014 Jon Schlinkert, Brian Woodward
  * Licensed under the MIT license.
  */
 
 'use strict';
 
 var loader = require('load-helpers');
-var rand = require('randomatic');
+var randomize = require('randomatic');
 var _ = require('lodash');
 
 
 /**
- * Utility method to define getters.
- *
- * @param  {Object} `obj`
- * @param  {String} `name`
- * @param  {Function} `getter`
- * @return {Getter}
- * @api private
- */
-
-function defineGetter(obj, name, getter) {
-  Object.defineProperty(obj, name, {
-    configurable: false,
-    enumerable: false,
-    get: getter,
-    set: function() {}
-  });
-}
-
-
-/**
+ * Create an instance of `Helpers`, optionally passing
+ * default `options`.
+ * 
  * ```js
  * var Helpers = require('helper-cache');
  * var helpers = new Helpers();
  * ```
  *
  * @param {Object} `options` Default options to use.
- *   @option {Boolean} [options] `bindFunctions` Bind functions to `this`. Defaults to `false`.
+ *   @option {Boolean} [options] `bind` Bind functions to `this`. Defaults to `false`.
  *   @option {Boolean} [options] `thisArg` The context to use.
  * @api public
  */
@@ -50,7 +33,7 @@ function Helpers(options) {
   }
 
   var opts = _.defaults({}, options, {
-    bindFunctions: false,
+    bind: false,
     thisArg: this
   });
 
@@ -80,7 +63,7 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
     if (typeof key !== 'string') {
       _.extend(this, key);
     } else {
-      if (this.options.bindFunctions) {
+      if (this.options.bind) {
         this[key] = _.bind(fn, thisArg);
       } else {
         this[key] = fn;
@@ -108,13 +91,13 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
       }, this);
     } else {
       var self = this;
-      if (this.options.bindFunctions) {
+      if (this.options.bind) {
         this._.asyncHelpers[key] = _.bind(fn, thisArg || this);
       } else {
         this._.asyncHelpers[key] = fn;
       }
       this.addHelper(key, function () {
-        var id = '__async_helper_id__' + rand('Aa0', 42) + '__';
+        var id = '__async_helper_id__' + randomize('Aa0', 42) + '__';
         var args = [].slice.call(arguments);
         self._.waiting.push({id: id, key: key, args: args, fn: fn.bind(this)});
         return id;
@@ -144,7 +127,7 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
     var helpers = loader.load.apply(loader, arguments);
     _.forIn(helpers.cache, function (value, key) {
       var o = {};
-      if (this.options.bindFunctions) {
+      if (this.options.bind) {
         o[key] = _.bind(value, thisArg);
       } else {
         o[key] = value;
@@ -257,5 +240,25 @@ defineGetter(Helpers.prototype, 'resolve', function () {
     return next(null, content);
   };
 });
+
+/**
+ * Utility method to define getters.
+ *
+ * @param  {Object} `obj`
+ * @param  {String} `name`
+ * @param  {Function} `getter`
+ * @return {Getter}
+ * @api private
+ */
+
+function defineGetter(obj, name, getter) {
+  Object.defineProperty(obj, name, {
+    configurable: false,
+    enumerable: false,
+    get: getter,
+    set: function() {}
+  });
+}
+
 
 module.exports = Helpers;
