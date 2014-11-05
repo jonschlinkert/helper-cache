@@ -99,12 +99,12 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addHelperAsync', function () {
+defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
   return function(key, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
     if (typeof key !== 'string') {
       _.forOwn(key, function (value, k) {
-        this.addHelperAsync(k, value, thisArg);
+        this.addAsyncHelper(k, value, thisArg);
       }, this);
     } else {
       var self = this;
@@ -167,12 +167,12 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addHelpersAsync', function () {
+defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
   return function () {
     var thisArg = this.options.thisArg;
     loader.init();
     var helpers = loader.load.apply(loader, arguments);
-    return this.addHelperAsync(helpers.cache);
+    return this.addAsyncHelper(helpers.cache);
   }.bind(this);
 });
 
