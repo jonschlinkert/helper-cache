@@ -58,7 +58,7 @@ function Helpers(options) {
     return opts;
   });
 
-  var obj = {helpersAsync: {}, waiting: []};
+  var obj = {asyncHelpers: {}, waiting: []};
   defineGetter(this, '_', function () {
     return obj;
   });
@@ -109,9 +109,9 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
     } else {
       var self = this;
       if (this.options.bindFunctions) {
-        this._.helpersAsync[key] = _.bind(fn, thisArg || this);
+        this._.asyncHelpers[key] = _.bind(fn, thisArg || this);
       } else {
-        this._.helpersAsync[key] = fn;
+        this._.asyncHelpers[key] = fn;
       }
       this.addHelper(key, function () {
         var id = '__async_helper_id__' + rand('Aa0', 42) + '__';
@@ -202,12 +202,12 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'getHelperAsync', function () {
+defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
   return function(key) {
     if (!key) {
-      return this._.helpersAsync;
+      return this._.asyncHelpers;
     }
-    return this._.helpersAsync[key];
+    return this._.asyncHelpers[key];
   }.bind(this);
 });
 
