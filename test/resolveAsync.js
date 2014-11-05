@@ -18,13 +18,13 @@ describe('resolve async helpers', function () {
     it('should resolve async helpers in a string.', function (done) {
       var helper = cache();
 
-      helper.addHelperAsync('lower', function (str, callback) {
+      helper.addAsyncHelper('lower', function (str, callback) {
         callback(null, str.toLowerCase());
       });
-      helper.addHelperAsync('upper', function (str, callback) {
+      helper.addAsyncHelper('upper', function (str, callback) {
         callback(null, str.toUpperCase());
       });
-      helper.addHelperAsync('sleep', function (ms, msg, callback) {
+      helper.addAsyncHelper('sleep', function (ms, msg, callback) {
         var start = new Date();
         setTimeout(function () {
           var end = new Date();

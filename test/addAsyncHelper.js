@@ -11,7 +11,7 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-describe('add helper async', function () {
+describe('add async helper', function () {
   it('should create instance of helper cache', function () {
     var actual = cache('foo');
 
@@ -22,7 +22,7 @@ describe('add helper async', function () {
 
   it('should set a helper by name', function () {
     var helpers = cache();
-    helpers.addHelperAsync('foo', function (str, callback) {
+    helpers.addAsyncHelper('foo', function (str, callback) {
       callback(null, str + ' foo');
     });
 
@@ -32,22 +32,22 @@ describe('add helper async', function () {
   it('should add individual helpers to the cache.', function () {
     var helpers = cache();
 
-    helpers.addHelperAsync('a', function (str, callback) {
+    helpers.addAsyncHelper('a', function (str, callback) {
       callback(null, str);
     });
 
-    helpers.addHelperAsync('b', function (str, callback) {
+    helpers.addAsyncHelper('b', function (str, callback) {
       callback(null, str);
     });
 
     var keys = Object.keys(helpers);
-    var keysAsync = Object.keys(helpers._.helpersAsync);
+    var asyncKeys = Object.keys(helpers._.asyncHelpers);
     keys.should.have.length(2);
-    keysAsync.should.have.length(2);
+    asyncKeys.should.have.length(2);
   });
   it('should set helpers from object', function () {
     var helpers = cache();
-    helpers.addHelperAsync({
+    helpers.addAsyncHelper({
       foo: function (str, callback) {
         callback(null, str + ' foo');
       },
@@ -58,14 +58,14 @@ describe('add helper async', function () {
 
     helpers.foo.should.be.a.function;
     helpers.bar.should.be.a.function;
-    helpers._.helpersAsync.foo.should.be.a.function;
-    helpers._.helpersAsync.bar.should.be.a.function;
+    helpers._.asyncHelpers.foo.should.be.a.function;
+    helpers._.asyncHelpers.bar.should.be.a.function;
 
   });
 
   it('should get a helper by name', function () {
     var helpers = cache();
-    helpers.addHelperAsync('foo', function (str, callback) {
+    helpers.addAsyncHelper('foo', function (str, callback) {
       callback(null, str + ' foo');
     });
     var foo = helpers.getHelper('foo');
@@ -74,7 +74,7 @@ describe('add helper async', function () {
 
   it('should get all helpers as object', function () {
     var helpers = cache();
-    helpers.addHelperAsync({
+    helpers.addAsyncHelper({
       foo: function (str, callback) {
         callback(null, str + ' foo');
       },
@@ -84,8 +84,8 @@ describe('add helper async', function () {
     });
 
     var obj = helpers.getHelper();
-    helpers._.helpersAsync.foo.should.be.a.function;
-    helpers._.helpersAsync.bar.should.be.a.function;
+    helpers._.asyncHelpers.foo.should.be.a.function;
+    helpers._.asyncHelpers.bar.should.be.a.function;
 
   });
 

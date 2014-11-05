@@ -11,7 +11,7 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-describe('add helpers async', function () {
+describe('add async helpers', function () {
   it('should create instance of helper cache', function () {
     var actual = cache('foo');
 
@@ -22,7 +22,7 @@ describe('add helpers async', function () {
 
   it('should add an object of helpers to the cache', function () {
     var helpers = cache();
-    helpers.addHelpersAsync({
+    helpers.addAsyncHelpers({
       a: function() {},
       b: function() {},
       c: function() {},
@@ -31,27 +31,27 @@ describe('add helpers async', function () {
     helpers.a.should.be.a.function;
     helpers.b.should.be.a.function;
     helpers.c.should.be.a.function;
-    helpers._.helpersAsync.a.should.be.a.function;
-    helpers._.helpersAsync.b.should.be.a.function;
-    helpers._.helpersAsync.c.should.be.a.function;
+    helpers._.asyncHelpers.a.should.be.a.function;
+    helpers._.asyncHelpers.b.should.be.a.function;
+    helpers._.asyncHelpers.c.should.be.a.function;
 
   });
 
   it('should add an object of helpers from a string of glob patterns.', function () {
     var helpers = cache();
-    helpers.addHelpersAsync('test/fixtures/obj/*.js');
+    helpers.addAsyncHelpers('test/fixtures/obj/*.js');
 
     helpers.a.should.be.a.function;
     helpers.b.should.be.a.function;
     helpers.c.should.be.a.function;
-    helpers._.helpersAsync.a.should.be.a.function;
-    helpers._.helpersAsync.b.should.be.a.function;
-    helpers._.helpersAsync.c.should.be.a.function;
+    helpers._.asyncHelpers.a.should.be.a.function;
+    helpers._.asyncHelpers.b.should.be.a.function;
+    helpers._.asyncHelpers.c.should.be.a.function;
   });
 
   it('should add an object of helpers from an array of file paths.', function () {
     var helpers = cache();
-    helpers.addHelpersAsync([
+    helpers.addAsyncHelpers([
       'test/fixtures/obj/a.js',
       'test/fixtures/obj/{b,c}.js'
     ]);
@@ -59,29 +59,29 @@ describe('add helpers async', function () {
     helpers.a.should.be.a.function;
     helpers.b.should.be.a.function;
     helpers.c.should.be.a.function;
-    helpers._.helpersAsync.a.should.be.a.function;
-    helpers._.helpersAsync.b.should.be.a.function;
-    helpers._.helpersAsync.c.should.be.a.function;
+    helpers._.asyncHelpers.a.should.be.a.function;
+    helpers._.asyncHelpers.b.should.be.a.function;
+    helpers._.asyncHelpers.c.should.be.a.function;
   });
 
   it('should add an object of helpers from an array of glob patterns.', function () {
     var helpers = cache();
-    helpers.addHelpersAsync(['test/fixtures/obj/*.js']);
+    helpers.addAsyncHelpers(['test/fixtures/obj/*.js']);
 
     helpers.a.should.be.a.function;
     helpers.b.should.be.a.function;
     helpers.c.should.be.a.function;
-    helpers._.helpersAsync.a.should.be.a.function;
-    helpers._.helpersAsync.b.should.be.a.function;
-    helpers._.helpersAsync.c.should.be.a.function;
+    helpers._.asyncHelpers.a.should.be.a.function;
+    helpers._.asyncHelpers.b.should.be.a.function;
+    helpers._.asyncHelpers.c.should.be.a.function;
   });
 
 
-  describe('.addHelpersAsync():', function () {
+  describe('.addAsyncHelpers():', function () {
     it('should add an object of helper functions to the cache.', function () {
       var helpers = cache();
 
-      helpers.addHelpersAsync({
+      helpers.addAsyncHelpers({
         a: function (str) {
           return str;
         },
@@ -113,11 +113,11 @@ describe('add helpers async', function () {
           }
         };
       };
-      var actual = helpers.addHelpersAsync(fn);
+      var actual = helpers.addAsyncHelpers(fn);
       helpers.should.have.property('foo');
       helpers.should.have.property('bar');
-      helpers._.helpersAsync.should.have.property('foo');
-      helpers._.helpersAsync.should.have.property('bar');
+      helpers._.asyncHelpers.should.have.property('foo');
+      helpers._.asyncHelpers.should.have.property('bar');
 
     });
 
@@ -155,25 +155,25 @@ describe('add helpers async', function () {
         ]
       ];
 
-      var actual = helpers.addHelpersAsync(arr);
+      var actual = helpers.addAsyncHelpers(arr);
       helpers.should.have.property('two');
       helpers.should.have.property('foo');
       helpers.should.have.property('three');
       helpers.should.have.property('bar');
-      helpers._.helpersAsync.should.have.property('two');
-      helpers._.helpersAsync.should.have.property('foo');
-      helpers._.helpersAsync.should.have.property('three');
-      helpers._.helpersAsync.should.have.property('bar');
+      helpers._.asyncHelpers.should.have.property('two');
+      helpers._.asyncHelpers.should.have.property('foo');
+      helpers._.asyncHelpers.should.have.property('three');
+      helpers._.asyncHelpers.should.have.property('bar');
 
     });
   });
 
-  describe('.addHelpersAsync()', function () {
+  describe('.addAsyncHelpers()', function () {
     it('should load helpers from a string', function () {
       var helpers = cache();
 
       var str = __dirname + '/fixtures/wrapped/wrapped.js';
-      var actual = helpers.addHelpersAsync(str);
+      var actual = helpers.addAsyncHelpers(str);
       helpers.should.have.property('wrapped');
     });
 
@@ -190,18 +190,18 @@ describe('add helpers async', function () {
           }
         };
       };
-      var actual = helpers.addHelpersAsync(fn);
+      var actual = helpers.addAsyncHelpers(fn);
       helpers.should.have.property('foo');
       helpers.should.have.property('bar');
-      helpers._.helpersAsync.should.have.property('foo');
-      helpers._.helpersAsync.should.have.property('bar');
+      helpers._.asyncHelpers.should.have.property('foo');
+      helpers._.asyncHelpers.should.have.property('bar');
     });
 
     it('should load helpers from an object', function () {
       var helpers = cache();
 
       var obj = require('./fixtures/wrapped/wrapped.js');
-      var actual = helpers.addHelpersAsync(obj);
+      var actual = helpers.addAsyncHelpers(obj);
 
       helpers.should.have.property('wrapped');
     });
@@ -214,19 +214,19 @@ describe('add helpers async', function () {
           return 'hi';
         }
       };
-      var actual = helpers.addHelpersAsync(obj);
+      var actual = helpers.addAsyncHelpers(obj);
       helpers.should.have.property('foo');
-      helpers._.helpersAsync.should.have.property('foo');
+      helpers._.asyncHelpers.should.have.property('foo');
     });
 
     it('should load helpers from a function', function () {
       var helpers = cache();
 
       var fn = require('./fixtures/two.js');
-      var actual = helpers.addHelpersAsync(fn);
+      var actual = helpers.addAsyncHelpers(fn);
 
       helpers.should.have.property('two');
-      helpers._.helpersAsync.should.have.property('two');
+      helpers._.asyncHelpers.should.have.property('two');
     });
 
     it('should load different types of helpers from an array', function () {
@@ -262,15 +262,15 @@ describe('add helpers async', function () {
         ]
       ];
 
-      var actual = helpers.addHelpersAsync(arr);
+      var actual = helpers.addAsyncHelpers(arr);
       helpers.should.have.property('two');
       helpers.should.have.property('foo');
       helpers.should.have.property('three');
       helpers.should.have.property('bar');
-      helpers._.helpersAsync.should.have.property('two');
-      helpers._.helpersAsync.should.have.property('foo');
-      helpers._.helpersAsync.should.have.property('three');
-      helpers._.helpersAsync.should.have.property('bar');
+      helpers._.asyncHelpers.should.have.property('two');
+      helpers._.asyncHelpers.should.have.property('foo');
+      helpers._.asyncHelpers.should.have.property('three');
+      helpers._.asyncHelpers.should.have.property('bar');
     });
   });
 });
@@ -291,12 +291,12 @@ describe('load functions:', function () {
         };
       };
 
-      var actual = helpers.addHelpersAsync(fn);
+      var actual = helpers.addAsyncHelpers(fn);
 
       actual.should.have.property('foo');
       actual.should.have.property('bar');
-      actual._.helpersAsync.should.have.property('foo');
-      actual._.helpersAsync.should.have.property('bar');
+      actual._.asyncHelpers.should.have.property('foo');
+      actual._.asyncHelpers.should.have.property('bar');
 
       var foo = helpers.getHelper('foo');
       assert.equal(typeof foo, 'function');

@@ -37,13 +37,13 @@ describe('resolve async helpers - nested', function () {
         });
       }
 
-      helper.addHelperAsync('lower', function (str, callback) {
+      helper.addAsyncHelper('lower', function (str, callback) {
         callback(null, str.toLowerCase());
       });
-      helper.addHelperAsync('upper', function (str, callback) {
+      helper.addAsyncHelper('upper', function (str, callback) {
         callback(null, str.toUpperCase());
       });
-      helper.addHelperAsync('sleep', function (ms, msg, callback) {
+      helper.addAsyncHelper('sleep', function (ms, msg, callback) {
         var start = new Date();
         setTimeout(function () {
           var end = new Date();
@@ -52,7 +52,7 @@ describe('resolve async helpers - nested', function () {
         }, ms);
       });
 
-      helper.addHelperAsync('partial', function (name, locals, callback) {
+      helper.addAsyncHelper('partial', function (name, locals, callback) {
         var partial = partials[name];
         if (!partial) return callback(null, '');
         if (typeof locals === 'function') {

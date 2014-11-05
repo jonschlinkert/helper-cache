@@ -13,25 +13,25 @@ var cache = require('..');
 
 
 describe('get async helpers', function () {
-  describe('.getHelperAsync():', function () {
+  describe('.getAsyncHelper():', function () {
     it('should get helpers from the cache.', function () {
       var helper = cache();
 
-      helper.addHelperAsync('a', function (str, callback) {
+      helper.addAsyncHelper('a', function (str, callback) {
         callback(null, str);
       });
-      helper.addHelperAsync('b', function (str, callback) {
+      helper.addAsyncHelper('b', function (str, callback) {
         callback(null, str);
       });
 
-      var keys = Object.keys(helper._.helpersAsync);
+      var keys = Object.keys(helper._.asyncHelpers);
       keys.should.have.length(2);
     });
 
     it('should get `load`ed helpers from the cache', function () {
       var helper = cache();
 
-      helper.addHelpersAsync({
+      helper.addAsyncHelpers({
         a: function (str, callback) {
           callback(null, str);
         },
@@ -45,8 +45,8 @@ describe('get async helpers', function () {
           callback(null, str);
         }
       });
-      var a = helper.getHelperAsync('a');
-      var b = helper.getHelperAsync('b');
+      var a = helper.getAsyncHelper('a');
+      var b = helper.getAsyncHelper('b');
 
       assert.equal(typeof a, 'function');
       assert.equal(typeof b, 'function');
