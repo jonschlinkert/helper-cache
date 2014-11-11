@@ -82,5 +82,67 @@ describe('resolve async helpers - nested', function () {
 
     });
 
+    it('should bubble up an error.', function (done) {
+      var helper = cache();
+
+      var partials = {
+        foo: {
+          data: { 'bar': 'baz' },
+          content: 'Hi there <%= bar %>'
+        },
+        bar: {
+          data: { 'baz': 'bang' },
+          content: 'This is <%= baz %>'
+        }
+      };
+
+      function render (content, options, cb) {
+        content = _.template(content, options, { imports: helper.getHelper() });
+        return helper.resolve(content, function (err, content) {
+          if (err) return cb(err);
+          return cb(null, content);
+        });
+      }
+
+      helper.addAsyncHelper('lower', function (str, callback) {
+        callback(null, str.toLowerCase());
+      });
+      helper.addAsyncHelper('upper', function (str, callback) {
+        callback(null, str.toUpperCase());
+      });
+      helper.addAsyncHelper('sleep', function (ms, msg, callback) {
+        var start = new Date();
+        setTimeout(function () {
+          var end = new Date();
+          var elapsed = end - start;
+          callback(null, elapsed + ' ' + msg);
+        }, ms);
+      });
+
+      helper.addAsyncHelper('partial', function (name, locals, callback) {
+        var partial = partials[name];
+        if (typeof locals === 'function') {
+          callback = locals;
+          locals = {};
+        }
+        if (!partial) return callback(new Error('Partial ' + name + ' not found!'));
+        render(partial.content, _.extend({}, partial.data, locals), callback);
+      });
+
+      var template = [
+        'Elapsed: <%= sleep(50, "milliseconds") %>',
+        'Lower: <%= lower(name) %>',
+        'Upper: <%= upper(name) %>',
+        'Partial-1: <%= partial("foo") %>',
+        'Partial-2: <%= partial("bar", { baz: "beep boop bop" }) %>',
+        'Partial-3: <%= partial("blah") %>'
+      ].join('\n');
+
+      var content = render(template, {name: 'Brian Woodward'}, function (err, content) {
+        if (err) return done();
+        return done(new Error('Expected an error'));
+      });
+
+    });
   });
 });

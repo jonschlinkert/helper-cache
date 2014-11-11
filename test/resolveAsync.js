@@ -47,7 +47,37 @@ describe('resolve async helpers', function () {
         /Upper: BRIAN WOODWARD/.test(content).should.be.true;
         done();
       });
+    });
 
+    it('should handle an error.', function (done) {
+      var helper = cache();
+
+      helper.addAsyncHelper('lower', function (str, callback) {
+        callback(null, str.toLowerCase());
+      });
+      helper.addAsyncHelper('upper', function (str, callback) {
+        callback(null, str.toUpperCase());
+      });
+      helper.addAsyncHelper('error', function (ms, msg, callback) {
+        var start = new Date();
+        setTimeout(function () {
+          var end = new Date();
+          var elapsed = end - start;
+          callback(new Error('Something bad happened'));
+        }, ms);
+      });
+
+      var template = [
+        'Elapsed: <%= error(50, "milliseconds") %>',
+        'Lower: <%= lower(name) %>',
+        'Upper: <%= upper(name) %>'
+      ].join('\n');
+
+      var content = _.template(template, {name: 'Brian Woodward'}, { imports: helper.getHelper() });
+      helper.resolve(content, function (err, content) {
+        if (err) return done();
+        done(new Error('Expected an error to be thrown.'));
+      });
     });
 
   });

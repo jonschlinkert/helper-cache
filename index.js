@@ -223,6 +223,7 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         // call the async helper and replace id with results
         var args = helper.args || [];
         var nextCallback = function (err, results) {
+          if (err) return cb(err);
           content = content.replace(helper.id, results);
           next(null, content);
         };
