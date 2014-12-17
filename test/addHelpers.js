@@ -33,7 +33,7 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
-  it('should add an object of helpers from a string of glob patterns.', function () {
+  it.skip('should add an object of helpers from a string of glob patterns.', function () {
     var helpers = cache();
     helpers.addHelpers('test/fixtures/obj/*.js');
 
@@ -42,7 +42,7 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
-  it('should add an object of helpers from an array of file paths.', function () {
+  it.skip('should add an object of helpers from an array of file paths.', function () {
     var helpers = cache();
     helpers.addHelpers([
       'test/fixtures/obj/a.js',
@@ -54,7 +54,7 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
-  it('should add an object of helpers from an array of glob patterns.', function () {
+  it.skip('should add an object of helpers from an array of glob patterns.', function () {
     var helpers = cache();
     helpers.addHelpers(['test/fixtures/obj/*.js']);
 
@@ -105,7 +105,7 @@ describe('add helper', function () {
       helpers.should.have.property('bar');
     });
 
-    it('should load different types of helpers from an array', function () {
+    it.skip('should load different types of helpers from an array', function () {
       var helpers = cache();
 
       var arr = [
@@ -148,7 +148,7 @@ describe('add helper', function () {
   });
 
   describe('.addHelpers()', function () {
-    it('should load helpers from a string', function () {
+    it.skip('should load helpers from a string', function () {
       var helpers = cache();
 
       var str = __dirname + '/fixtures/wrapped/wrapped.js';
@@ -204,7 +204,7 @@ describe('add helper', function () {
       helpers.should.have.property('two');
     });
 
-    it('should load different types of helpers from an array', function () {
+    it.skip('should load different types of helpers from an array', function () {
       var helpers = cache();
       var arr = [
         'test/fixtures/two.js',

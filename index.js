@@ -7,7 +7,6 @@
 
 'use strict';
 
-var loader = require('load-helpers');
 var randomize = require('randomatic');
 var _ = require('lodash');
 
@@ -34,7 +33,7 @@ function Helpers(options) {
 
   var opts = _.defaults({}, options, {
     bind: false,
-    thisArg: this
+    thisArg: null
   });
 
   defineGetter(this, 'options', function () {
@@ -60,11 +59,14 @@ function Helpers(options) {
 defineGetter(Helpers.prototype, 'addHelper', function () {
   return function (key, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+    if (typeof key === 'function') {
+      return this.addHelpers.call(this, arguments);
+    }
 
     if (typeof key !== 'string') {
       _.extend(this, key);
     } else {
-      if (this.options.bind) {
+      if (thisArg && this.options.bind) {
         this[key] = _.bind(fn, thisArg);
       } else {
         this[key] = fn;
@@ -87,14 +89,18 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
   return function(key, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+    if (typeof key === 'function') {
+      return this.addAsyncHelpers.call(this, arguments);
+    }
+
     if (typeof key !== 'string') {
       _.forOwn(key, function (value, k) {
         this.addAsyncHelper(k, value, thisArg);
       }, this);
     } else {
       var self = this;
-      if (this.options.bind) {
-        this._.asyncHelpers[key] = _.bind(fn, thisArg || this);
+      if (thisArg && this.options.bind) {
+        this._.asyncHelpers[key] = _.bind(fn, thisArg);
       } else {
         this._.asyncHelpers[key] = fn;
       }
@@ -113,8 +119,6 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
 /**
  * Add an object of helpers to the cache.
  *
- * See [load-helpers] for issues, API details and the full range of options.
- *
  * @name  addHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
@@ -122,23 +126,21 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
  */
 
 defineGetter(Helpers.prototype, 'addHelpers', function () {
-  return function () {
-    var thisArg = this.options.thisArg;
+  return function (helpers, thisArg) {
+    thisArg = thisArg || this.options.thisArg;
+    if (typeof helpers === 'function') {
+      helpers = helpers(this.options, thisArg);
+    }
 
-    loader.init();
-
-    var helpers = loader.load.apply(loader, arguments);
-    _.forIn(helpers.cache, function (value, key) {
-      var o = {};
-      if (this.options.bind) {
+    var o = {};
+    _.forIn(helpers, function (value, key) {
+      if (thisArg && this.options.bind) {
         o[key] = _.bind(value, thisArg);
       } else {
         o[key] = value;
       }
-      _.extend(this, o);
     }, this);
-
-    return this;
+    return this.addHelper(o);
   }.bind(this);
 });
 
@@ -155,11 +157,12 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
  */
 
 defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
-  return function () {
-    var thisArg = this.options.thisArg;
-    loader.init();
-    var helpers = loader.load.apply(loader, arguments);
-    return this.addAsyncHelper(helpers.cache);
+  return function (helpers, thisArg) {
+    thisArg = thisArg || this.options.thisArg;
+    if (typeof helpers === 'function') {
+      helpers = helpers(this.options, thisArg);
+    }
+    return this.addAsyncHelper(helpers, thisArg);
   }.bind(this);
 });
 
