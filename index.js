@@ -15,7 +15,7 @@ var _ = require('lodash');
 /**
  * Create an instance of `Helpers`, optionally passing
  * default `options`.
- * 
+ *
  * ```js
  * var Helpers = require('helper-cache');
  * var helpers = new Helpers();
@@ -51,6 +51,7 @@ function Helpers(options) {
 /**
  * Set helpers on the cache.
  *
+ * @name  addHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -77,6 +78,7 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 /**
  * Set async helpers on the cache.
  *
+ * @name  addAsyncHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -113,6 +115,7 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
  *
  * See [load-helpers] for issues, API details and the full range of options.
  *
+ * @name  addHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -145,6 +148,7 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
  *
  * See [load-helpers] for issues, API details and the full range of options.
  *
+ * @name  addAsyncHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -163,6 +167,7 @@ defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
 /**
  * Get a helper from the cache.
  *
+ * @name  getHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -180,6 +185,7 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
 /**
  * Get an async helper from the cache.
  *
+ * @name  getAsyncHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -198,6 +204,7 @@ defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
  * Getter method to resolve async helper values that were called during
  * the render process.
  *
+ * @name  resolve
  * @param {String} `content` Rendered string containing async ids
  * @param {Function} `cb`
  * @api public
