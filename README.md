@@ -11,7 +11,7 @@ npm i helper-cache --save-dev
 
 ## API
 
-### [Helpers](index.js#L30)
+### [Helpers](index.js#L29)
 
 Create an instance of `Helpers`, optionally passing default `options`.
 
@@ -25,53 +25,85 @@ var Helpers = require('helper-cache');
 var helpers = new Helpers();
 ```
 
-### [addHelper](index.js#L60)
-
-* `key` **{String}**: The name of the helper.    
-* `fn` **{Function}**: Helper function.    
+### [addHelper](index.js#L66)
 
 Set helpers on the cache.
 
-### [addAsyncHelper](index.js#L87)
-
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
+
+```js
+helpers.add('foo', function (name) {
+  return 'foo-' + name;
+});
+```
+
+### [addAsyncHelper](index.js#L110)
 
 Set async helpers on the cache.
 
-### [addHelpers](index.js#L124)
+* `key` **{String}**: The name of the helper.    
+* `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
+
+```js
+helpers.addAsyncHelper('foo', function (name, next) {
+  next(null, 'foo-' + name);
+});
+```
+
+### [addHelpers](index.js#L165)
 
 Add an object of helpers to the cache.
 
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining.  
 
-See [load-helpers] for issues, API details and the full range of options.
+```js
+helpers.addHelpers({
+  foo: function (name) {
+    return 'foo-' + name;
+  },
+  bar: function (name) {
+    return 'bar-' + name;
+  }
+});
 
-### [addAsyncHelpers](index.js#L157)
+### [addAsyncHelpers](index.js#L210)
 
 Add an object of async helpers to the cache.
 
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
 
-See [load-helpers] for issues, API details and the full range of options.
+```js
+helpers.addAsyncHelpers({
+  foo: function (name, next) {
+    next(null, 'foo-' + name);
+  },
+  bar: function (name, next) {
+    next(null, 'bar-' + name);
+  }
+});
 
-### [getHelper](index.js#L176)
+### [getHelper](index.js#L234)
 
 * `key` **{String}**: The helper to get.    
 * `returns` **{Object}**: The specified helper. If no `key` is passed, the entire cache is returned.  
 
 Get a helper from the cache.
 
-### [getAsyncHelper](index.js#L194)
+### [getAsyncHelper](index.js#L252)
 
 * `key` **{String}**: The helper to get.    
 * `returns` **{Object}**: The specified helper. If no `key` is passed, the entire cache is returned.  
 
 Get an async helper from the cache.
 
-### [resolve](index.js#L213)
+### [resolve](index.js#L271)
 
 * `content` **{String}**: Rendered string containing async ids    
 * `cb` **{Function}**    

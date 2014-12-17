@@ -50,28 +50,42 @@ function Helpers(options) {
 /**
  * Set helpers on the cache.
  *
+ * ```js
+ * helpers.add('foo', function (name) {
+ *   return 'foo-' + name;
+ * });
+ * ```
+ *
  * @name  addHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
+ * @return {Object} Return `this` to enable chaining
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addHelper', function () {
   return function (key, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+
+    // `addHelpers` handles functions
     if (typeof key === 'function') {
       return this.addHelpers.call(this, arguments);
     }
 
+    // just extend an object
     if (typeof key !== 'string') {
       _.extend(this, key);
     } else {
+
+      // when `thisArg` and binding is turned on
       if (thisArg && this.options.bind) {
         this[key] = _.bind(fn, thisArg);
       } else {
         this[key] = fn;
       }
     }
+
+    // chaining
     return this;
   }.bind(this);
 });
@@ -80,30 +94,42 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 /**
  * Set async helpers on the cache.
  *
+ * ```js
+ * helpers.addAsyncHelper('foo', function (name, next) {
+ *   next(null, 'foo-' + name);
+ * });
+ * ```
+ *
  * @name  addAsyncHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
+ * @return {Object} Return `this` to enable chaining
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
   return function(key, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+
+    // `addAsyncHelpers` handles functions
     if (typeof key === 'function') {
       return this.addAsyncHelpers.call(this, arguments);
     }
 
+    // pass each key/value pair to `addAsyncHelper`
     if (typeof key !== 'string') {
       _.forOwn(key, function (value, k) {
         this.addAsyncHelper(k, value, thisArg);
       }, this);
     } else {
       var self = this;
+      // keep a reference to the original async helper
       if (thisArg && this.options.bind) {
         this._.asyncHelpers[key] = _.bind(fn, thisArg);
       } else {
         this._.asyncHelpers[key] = fn;
       }
+      // create a new sync helper that is used in the first pass
       this.addHelper(key, function () {
         var id = '__async_helper_id__' + randomize('Aa0', 42) + '__';
         var args = [].slice.call(arguments);
@@ -119,19 +145,33 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
 /**
  * Add an object of helpers to the cache.
  *
+ * ```js
+ * helpers.addHelpers({
+ *   foo: function (name) {
+ *     return 'foo-' + name;
+ *   },
+ *   bar: function (name) {
+ *     return 'bar-' + name;
+ *   }
+ * });
+ *
  * @name  addHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
+ * @return {Object} Return `this` to enable chaining.
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addHelpers', function () {
   return function (helpers, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+
+    // when a function is passed, execute it and use the results
     if (typeof helpers === 'function') {
-      helpers = helpers(this.options, thisArg);
+      return this.addHelpers(helpers(thisArg), thisArg);
     }
 
+    // allow binding each helper if enabled
     var o = {};
     _.forIn(helpers, function (value, key) {
       if (thisArg && this.options.bind) {
@@ -140,6 +180,8 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
         o[key] = value;
       }
     }, this);
+
+    // use `addHelper` to extend the object
     return this.addHelper(o);
   }.bind(this);
 });
@@ -148,20 +190,33 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
 /**
  * Add an object of async helpers to the cache.
  *
- * See [load-helpers] for issues, API details and the full range of options.
+ * ```js
+ * helpers.addAsyncHelpers({
+ *   foo: function (name, next) {
+ *     next(null, 'foo-' + name);
+ *   },
+ *   bar: function (name, next) {
+ *     next(null, 'bar-' + name);
+ *   }
+ * });
  *
  * @name  addAsyncHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
+ * @return {Object} Return `this` to enable chaining
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
   return function (helpers, thisArg) {
     thisArg = thisArg || this.options.thisArg;
+
+    // when a function is passed, execute it and use the results
     if (typeof helpers === 'function') {
-      helpers = helpers(this.options, thisArg);
+      return this.addAsyncHelpers(helpers(thisArg), thisArg);
     }
+
+    // use `addAsyncHelper` to extend the object
     return this.addAsyncHelper(helpers, thisArg);
   }.bind(this);
 });
