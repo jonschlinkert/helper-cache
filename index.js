@@ -15,7 +15,7 @@ var _ = require('lodash');
 /**
  * Create an instance of `Helpers`, optionally passing
  * default `options`.
- * 
+ *
  * ```js
  * var Helpers = require('helper-cache');
  * var helpers = new Helpers();
@@ -219,6 +219,8 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         if (content.indexOf(helper.id) === -1) {
           return next(null, content);
         }
+        // replacing this helper id so remove it from the waiting list
+        delete self._.waiting[i-1];
 
         // call the async helper and replace id with results
         var args = helper.args || [];
