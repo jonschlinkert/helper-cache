@@ -206,10 +206,10 @@ defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
 defineGetter(Helpers.prototype, 'resolve', function () {
   return function (content, cb) {
     var self = this;
-    var i = 0;
+    var i = self._.waiting.length;
     var next = function (err, content) {
       // current helper info
-      var helper = self._.waiting[i++];
+      var helper = self._.waiting[--i];
 
       if (helper) {
         // original async helper
@@ -220,13 +220,14 @@ defineGetter(Helpers.prototype, 'resolve', function () {
           return next(null, content);
         }
         // replacing this helper id so remove it from the waiting list
-        delete self._.waiting[i-1];
 
         // call the async helper and replace id with results
         var args = helper.args || [];
         var nextCallback = function (err, results) {
           if (err) return cb(err);
           content = content.replace(helper.id, results);
+          // remove the helper from the waiting list
+          self._.waiting.splice(i+1, 1);
           next(null, content);
         };
         if (args[args.length-1].toString() !== nextCallback.toString()) {
