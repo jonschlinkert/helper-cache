@@ -1,7 +1,7 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Copyright (c) 2014-2015 Jon Schlinkert
  * Licensed under the MIT License
  */
 
