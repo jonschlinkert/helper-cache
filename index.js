@@ -1,7 +1,7 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, Brian Woodward
+ * Copyright (c) 2014-2015 Jon Schlinkert, Brian Woodward
  * Licensed under the MIT license.
  */
 
@@ -49,24 +49,31 @@ function Helpers(options) {
 
 
 /**
- * Set helpers on the cache.
+ * Register a helper.
  *
- * @param {String} `key` The name of the helper.
+ * ```js
+ * helpers.addHelper('lower', function(str) {
+ *   return str.toLowerCase();
+ * });
+ * ```
+ *
+ * @name .addHelper
+ * @param {String} `name` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addHelper', function () {
-  return function (key, fn, thisArg) {
+  return function (name, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
 
-    if (typeof key !== 'string') {
-      _.extend(this, key);
+    if (typeof name !== 'string') {
+      _.extend(this, name);
     } else {
       if (this.options.bind) {
-        this[key] = _.bind(fn, thisArg);
+        this[name] = _.bind(fn, thisArg);
       } else {
-        this[key] = fn;
+        this[name] = fn;
       }
     }
     return this;
@@ -75,8 +82,15 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 
 
 /**
- * Set async helpers on the cache.
+ * Register an async helper.
  *
+ * ```js
+ * helpers.addAsyncHelper('foo', function (str, callback) {
+ *   callback(null, str + ' foo');
+ * });
+ * ```
+ *
+ * @name .addAsyncHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -109,10 +123,23 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
 
 
 /**
- * Add an object of helpers to the cache.
+ * Load a glob or object of helpers.
+ *
+ * ```js
+ * // glob patterns
+ * helpers.addHelpers('helpers/*.js');
+ * helpers.addHelpers(['helpers/a.js', 'helpers/{b,c}.js']);
+ * // object of helper functions
+ * helpers.addHelpers({
+ *   a: function() {},
+ *   b: function() {},
+ *   c: function() {},
+ * });
+ * ```
  *
  * See [load-helpers] for issues, API details and the full range of options.
  *
+ * @name .addHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -141,10 +168,23 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
 
 
 /**
- * Add an object of async helpers to the cache.
+ * Load a glob or object of async helpers.
+ *
+ * ```js
+ * // glob patterns
+ * helpers.addAsyncHelpers('helpers/*.js');
+ * helpers.addAsyncHelpers(['helpers/a.js', 'helpers/{b,c}.js']);
+ * // object of helper functions
+ * helpers.addAsyncHelpers({
+ *   a: function() {},
+ *   b: function() {},
+ *   c: function() {},
+ * });
+ * ```
  *
  * See [load-helpers] for issues, API details and the full range of options.
  *
+ * @name .addAsyncHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @api public
@@ -161,8 +201,13 @@ defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
 
 
 /**
- * Get a helper from the cache.
+ * Get a registered helper.
  *
+ * ```js
+ * helpers.getHelper('foo');
+ * ```
+ *
+ * @name .getHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -178,8 +223,13 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
 });
 
 /**
- * Get an async helper from the cache.
+ * Get a registered async helper.
  *
+ * ```js
+ * helpers.getAsyncHelper('foo');
+ * ```
+ *
+ * @name .getAsyncHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -196,14 +246,23 @@ defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
 
 /**
  * Getter method to resolve async helper values that were called during
- * the render process.
+ * the render process. Rendering is done by whatever engine you've registered
+ * the helpers with.
  *
+ * ```js
+ * helper.resolveHelper(str, function (err, content) {
+ *   if (err) return done(err);
+ *   // do stuff with `content`
+ *   done();
+ * });
+ * ```
+ * @name .resolveHelper
  * @param {String} `content` Rendered string containing async ids
  * @param {Function} `cb`
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'resolve', function () {
+defineGetter(Helpers.prototype, 'resolveHelper', function () {
   return function (content, cb) {
     var self = this;
     var i = self._.waiting.length;
@@ -219,8 +278,8 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         if (content.indexOf(helper.id) === -1) {
           return next(null, content);
         }
-        // replacing this helper id so remove it from the waiting list
 
+        // replacing this helper id, so remove it from the waiting list
         // call the async helper and replace id with results
         var args = helper.args || [];
         var nextCallback = function (err, results) {
@@ -235,7 +294,6 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         }
 
         fn.apply(fn, args);
-
       } else {
         // call final callback
         return cb(null, content);
