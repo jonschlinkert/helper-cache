@@ -1,7 +1,7 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Copyright (c) 2014-2015 Jon Schlinkert
  * Licensed under the MIT License
  */
 
@@ -14,7 +14,7 @@ var _ = require('lodash');
 
 
 describe('resolve async helpers - nested', function () {
-  describe('.resolve():', function () {
+  describe('.resolveHelpers():', function () {
     it('should resolve async helpers in a string.', function (done) {
       var helper = cache();
 
@@ -31,7 +31,7 @@ describe('resolve async helpers - nested', function () {
 
       function render (content, options, cb) {
         content = _.template(content, options, { imports: helper.getHelper() });
-        return helper.resolve(content, function (err, content) {
+        return helper.resolveHelper(content, function (err, content) {
           if (err) return cb(err);
           return cb(null, content);
         });
@@ -98,7 +98,7 @@ describe('resolve async helpers - nested', function () {
 
       function render (content, options, cb) {
         content = _.template(content, options, { imports: helper.getHelper() });
-        return helper.resolve(content, function (err, content) {
+        return helper.resolveHelper(content, function (err, content) {
           if (err) return cb(err);
           return cb(null, content);
         });

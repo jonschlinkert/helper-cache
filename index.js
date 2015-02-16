@@ -1,7 +1,7 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, Brian Woodward
+ * Copyright (c) 2014-2015 Jon Schlinkert, Brian Woodward
  * Licensed under the MIT license.
  */
 
@@ -48,40 +48,39 @@ function Helpers(options) {
 
 
 /**
- * Set helpers on the cache.
+ * Register a helper.
  *
  * ```js
- * helpers.add('foo', function (name) {
- *   return 'foo-' + name;
+ * helpers.addHelper('lower', function(str) {
+ *   return str.toLowerCase();
  * });
  * ```
  *
- * @name  addHelper
- * @param {String} `key` The name of the helper.
+ * @name .addHelper
+ * @param {String} `name` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @return {Object} Return `this` to enable chaining
  * @api public
  */
 
 defineGetter(Helpers.prototype, 'addHelper', function () {
-  return function (key, fn, thisArg) {
+  return function (name, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
 
     // `addHelpers` handles functions
-    if (typeof key === 'function') {
+    if (typeof name === 'function') {
       return this.addHelpers.call(this, arguments);
     }
 
-    // just extend an object
-    if (typeof key !== 'string') {
-      _.extend(this, key);
+    if (typeof name !== 'string') {
+      _.extend(this, name);
     } else {
 
       // when `thisArg` and binding is turned on
       if (thisArg && this.options.bind) {
-        this[key] = _.bind(fn, thisArg);
+        this[name] = _.bind(fn, thisArg);
       } else {
-        this[key] = fn;
+        this[name] = fn;
       }
     }
 
@@ -92,15 +91,15 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 
 
 /**
- * Set async helpers on the cache.
+ * Register an async helper.
  *
  * ```js
- * helpers.addAsyncHelper('foo', function (name, next) {
- *   next(null, 'foo-' + name);
+ * helpers.addAsyncHelper('foo', function (str, callback) {
+ *   callback(null, str + ' foo');
  * });
  * ```
  *
- * @name  addAsyncHelper
+ * @name .addAsyncHelper
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @return {Object} Return `this` to enable chaining
@@ -143,19 +142,17 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
 
 
 /**
- * Add an object of helpers to the cache.
+ * Load an object of helpers.
  *
  * ```js
  * helpers.addHelpers({
- *   foo: function (name) {
- *     return 'foo-' + name;
- *   },
- *   bar: function (name) {
- *     return 'bar-' + name;
- *   }
+ *   a: function() {},
+ *   b: function() {},
+ *   c: function() {},
  * });
+ * ```
  *
- * @name  addHelpers
+ * @name .addHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @return {Object} Return `this` to enable chaining.
@@ -188,19 +185,17 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
 
 
 /**
- * Add an object of async helpers to the cache.
+ * Load an object of async helpers.
  *
  * ```js
  * helpers.addAsyncHelpers({
- *   foo: function (name, next) {
- *     next(null, 'foo-' + name);
- *   },
- *   bar: function (name, next) {
- *     next(null, 'bar-' + name);
- *   }
+ *   a: function() {},
+ *   b: function() {},
+ *   c: function() {},
  * });
+ * ```
  *
- * @name  addAsyncHelpers
+ * @name .addAsyncHelpers
  * @param {String} `key` The name of the helper.
  * @param {Function} `fn` Helper function.
  * @return {Object} Return `this` to enable chaining
@@ -223,9 +218,13 @@ defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
 
 
 /**
- * Get a helper from the cache.
+ * Get a registered helper.
  *
- * @name  getHelper
+ * ```js
+ * helpers.getHelper('foo');
+ * ```
+ *
+ * @name .getHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -241,9 +240,13 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
 });
 
 /**
- * Get an async helper from the cache.
+ * Get a registered async helper.
  *
- * @name  getAsyncHelper
+ * ```js
+ * helpers.getAsyncHelper('foo');
+ * ```
+ *
+ * @name .getAsyncHelper
  * @param  {String} `key` The helper to get.
  * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
  * @api public
@@ -260,21 +263,29 @@ defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
 
 /**
  * Getter method to resolve async helper values that were called during
- * the render process.
+ * the render process. Rendering is done by whatever engine you've registered
+ * the helpers with.
  *
- * @name  resolve
+ * ```js
+ * helper.resolveHelper(str, function (err, content) {
+ *   if (err) return done(err);
+ *   // do stuff with `content`
+ *   done();
+ * });
+ * ```
+ * @name .resolveHelper
  * @param {String} `content` Rendered string containing async ids
  * @param {Function} `cb`
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'resolve', function () {
+defineGetter(Helpers.prototype, 'resolveHelper', function () {
   return function (content, cb) {
     var self = this;
-    var i = 0;
+    var i = self._.waiting.length;
     var next = function (err, content) {
       // current helper info
-      var helper = self._.waiting[i++];
+      var helper = self._.waiting[--i];
 
       if (helper) {
         // original async helper
@@ -285,11 +296,14 @@ defineGetter(Helpers.prototype, 'resolve', function () {
           return next(null, content);
         }
 
+        // replacing this helper id, so remove it from the waiting list
         // call the async helper and replace id with results
         var args = helper.args || [];
         var nextCallback = function (err, results) {
           if (err) return cb(err);
           content = content.replace(helper.id, results);
+          // remove the helper from the waiting list
+          self._.waiting.splice(i+1, 1);
           next(null, content);
         };
         if (args[args.length-1].toString() !== nextCallback.toString()) {
@@ -297,7 +311,6 @@ defineGetter(Helpers.prototype, 'resolve', function () {
         }
 
         fn.apply(fn, args);
-
       } else {
         // call final callback
         return cb(null, content);

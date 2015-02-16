@@ -1,7 +1,7 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Copyright (c) 2014-2015 Jon Schlinkert
  * Licensed under the MIT License
  */
 
@@ -40,7 +40,7 @@ describe('resolve async helpers', function () {
       ].join('\n');
 
       var content = _.template(template, {name: 'Brian Woodward'}, { imports: helper.getHelper() });
-      helper.resolve(content, function (err, content) {
+      helper.resolveHelper(content, function (err, content) {
         if (err) return done(err);
         // /Elapsed: 51/.test(content).should.be.true;
         /Lower: brian woodward/.test(content).should.be.true;
@@ -74,7 +74,7 @@ describe('resolve async helpers', function () {
       ].join('\n');
 
       var content = _.template(template, {name: 'Brian Woodward'}, { imports: helper.getHelper() });
-      helper.resolve(content, function (err, content) {
+      helper.resolveHelper(content, function (err, content) {
         if (err) return done();
         done(new Error('Expected an error to be thrown.'));
       });

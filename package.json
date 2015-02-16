@@ -1,6 +1,6 @@
 {
   "name": "helper-cache",
-  "description": "Easily get and set helper functions to pass to any application or template engine.",
+  "description": "Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.",
   "version": "0.5.1",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
   "author": {
@@ -23,7 +23,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/jonschlinkert/helper-cache/blob/master/LICENSE-MIT"
+      "url": "https://github.com/jonschlinkert/helper-cache/blob/master/LICENSE"
     }
   ],
   "main": "index.js",
@@ -31,11 +31,11 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha"
   },
   "dependencies": {
     "lodash": "^2.4.1",
-    "randomatic": "^0.1.4"
+    "randomatic": "^1.1.0"
   },
   "devDependencies": {
     "mocha": "*",
