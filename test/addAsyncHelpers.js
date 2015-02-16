@@ -223,7 +223,7 @@ describe('add async helpers', function () {
       var helpers = cache();
 
       var fn = require('./fixtures/two.js');
-      var actual = helpers.addAsyncHelpers(fn);
+      var actual = helpers.addAsyncHelpers({ 'two': fn });
 
       helpers.should.have.property('two');
       helpers._.asyncHelpers.should.have.property('two');

@@ -1,7 +1,5 @@
 'use strict';
 
-module.exports = {
-  'three': function () {
-    return 'THREE!';
-  }
+module.exports = function () {
+  return 'THREE!';
 };

@@ -199,7 +199,7 @@ describe('add helper', function () {
       var helpers = cache();
 
       var fn = require('./fixtures/two.js');
-      var actual = helpers.addHelpers(fn);
+      var actual = helpers.addHelpers({ 'two': fn });
 
       helpers.should.have.property('two');
     });

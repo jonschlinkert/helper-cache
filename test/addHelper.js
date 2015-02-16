@@ -43,6 +43,7 @@ describe('add helper', function () {
     var keys = Object.keys(helpers);
     keys.should.have.length(2);
   });
+
   it('should set helpers from object', function () {
     var helpers = cache();
     helpers.addHelper({
