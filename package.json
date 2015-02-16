@@ -1,7 +1,7 @@
 {
   "name": "helper-cache",
   "description": "Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
   "author": {
     "name": "Jon Schlinkert",
