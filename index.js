@@ -7,9 +7,7 @@
 
 'use strict';
 
-var randomize = require('randomatic');
 var _ = require('lodash');
-
 
 /**
  * Create an instance of `Helpers`, optionally passing
@@ -38,11 +36,6 @@ function Helpers(options) {
 
   defineGetter(this, 'options', function () {
     return opts;
-  });
-
-  var obj = {asyncHelpers: {}, waiting: []};
-  defineGetter(this, '_', function () {
-    return obj;
   });
 }
 
@@ -108,8 +101,6 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
 
 defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
   return function(key, fn, thisArg) {
-    thisArg = thisArg || this.options.thisArg;
-
     // `addAsyncHelpers` handles functions
     if (typeof key === 'function') {
       return this.addAsyncHelpers.call(this, arguments);
@@ -121,20 +112,8 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
         this.addAsyncHelper(k, value, thisArg);
       }, this);
     } else {
-      var self = this;
-      // keep a reference to the original async helper
-      if (thisArg && this.options.bind) {
-        this._.asyncHelpers[key] = _.bind(fn, thisArg);
-      } else {
-        this._.asyncHelpers[key] = fn;
-      }
-      // create a new sync helper that is used in the first pass
-      this.addHelper(key, function () {
-        var id = '__async_helper_id__' + randomize('Aa0', 42) + '__';
-        var args = [].slice.call(arguments);
-        self._.waiting.push({id: id, key: key, args: args, fn: fn.bind(this)});
-        return id;
-      });
+      fn.async = true;
+      this.addHelper(key, fn, thisArg);
     }
     return this;
   }
@@ -204,10 +183,9 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
 
 defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
   return function (helpers, thisArg) {
-    thisArg = thisArg || this.options.thisArg;
-
     // when a function is passed, execute it and use the results
     if (typeof helpers === 'function') {
+      thisArg = thisArg || this.options.thisArg;
       return this.addAsyncHelpers(helpers(thisArg), thisArg);
     }
 
@@ -237,87 +215,6 @@ defineGetter(Helpers.prototype, 'getHelper', function () {
     }
     return this[key];
   }.bind(this);
-});
-
-/**
- * Get a registered async helper.
- *
- * ```js
- * helpers.getAsyncHelper('foo');
- * ```
- *
- * @name .getAsyncHelper
- * @param  {String} `key` The helper to get.
- * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
- * @api public
- */
-
-defineGetter(Helpers.prototype, 'getAsyncHelper', function () {
-  return function(key) {
-    if (!key) {
-      return this._.asyncHelpers;
-    }
-    return this._.asyncHelpers[key];
-  }.bind(this);
-});
-
-/**
- * Getter method to resolve async helper values that were called during
- * the render process. Rendering is done by whatever engine you've registered
- * the helpers with.
- *
- * ```js
- * helper.resolveHelper(str, function (err, content) {
- *   if (err) return done(err);
- *   // do stuff with `content`
- *   done();
- * });
- * ```
- * @name .resolveHelper
- * @param {String} `content` Rendered string containing async ids
- * @param {Function} `cb`
- * @api public
- */
-
-defineGetter(Helpers.prototype, 'resolveHelper', function () {
-  return function (content, cb) {
-    var self = this;
-    var i = self._.waiting.length;
-    var next = function (err, content) {
-      // current helper info
-      var helper = self._.waiting[--i];
-
-      if (helper) {
-        // original async helper
-        var fn = helper.fn;
-
-        if (!fn) return next(null, content);
-        if (content.indexOf(helper.id) === -1) {
-          return next(null, content);
-        }
-
-        // replacing this helper id, so remove it from the waiting list
-        // call the async helper and replace id with results
-        var args = helper.args || [];
-        var nextCallback = function (err, results) {
-          if (err) return cb(err);
-          content = content.replace(helper.id, results);
-          // remove the helper from the waiting list
-          self._.waiting.splice(i+1, 1);
-          next(null, content);
-        };
-        if (args[args.length-1].toString() !== nextCallback.toString()) {
-          args.push(nextCallback);
-        }
-
-        fn.apply(fn, args);
-      } else {
-        // call final callback
-        return cb(null, content);
-      }
-    }
-    return next(null, content);
-  };
 });
 
 /**

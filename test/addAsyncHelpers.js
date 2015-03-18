@@ -13,7 +13,7 @@ var cache = require('..');
 
 describe('add async helpers', function () {
   it('should create instance of helper cache', function () {
-    var actual = cache('foo');
+    var actual = cache();
 
     actual.should.be.an.object;
     actual.should.be.instanceof.cache;
@@ -31,51 +31,10 @@ describe('add async helpers', function () {
     helpers.a.should.be.a.function;
     helpers.b.should.be.a.function;
     helpers.c.should.be.a.function;
-    helpers._.asyncHelpers.a.should.be.a.function;
-    helpers._.asyncHelpers.b.should.be.a.function;
-    helpers._.asyncHelpers.c.should.be.a.function;
-
+    helpers.a.async.should.be.true;
+    helpers.b.async.should.be.true;
+    helpers.c.async.should.be.true;
   });
-
-  it.skip('should add an object of helpers from a string of glob patterns.', function () {
-    var helpers = cache();
-    helpers.addAsyncHelpers('test/fixtures/obj/*.js');
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-    helpers._.asyncHelpers.a.should.be.a.function;
-    helpers._.asyncHelpers.b.should.be.a.function;
-    helpers._.asyncHelpers.c.should.be.a.function;
-  });
-
-  it.skip('should add an object of helpers from an array of file paths.', function () {
-    var helpers = cache();
-    helpers.addAsyncHelpers([
-      'test/fixtures/obj/a.js',
-      'test/fixtures/obj/{b,c}.js'
-    ]);
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-    helpers._.asyncHelpers.a.should.be.a.function;
-    helpers._.asyncHelpers.b.should.be.a.function;
-    helpers._.asyncHelpers.c.should.be.a.function;
-  });
-
-  it.skip('should add an object of helpers from an array of glob patterns.', function () {
-    var helpers = cache();
-    helpers.addAsyncHelpers(['test/fixtures/obj/*.js']);
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-    helpers._.asyncHelpers.a.should.be.a.function;
-    helpers._.asyncHelpers.b.should.be.a.function;
-    helpers._.asyncHelpers.c.should.be.a.function;
-  });
-
 
   describe('.addAsyncHelpers():', function () {
     it('should add an object of helper functions to the cache.', function () {
@@ -116,191 +75,8 @@ describe('add async helpers', function () {
       var actual = helpers.addAsyncHelpers(fn);
       helpers.should.have.property('foo');
       helpers.should.have.property('bar');
-      helpers._.asyncHelpers.should.have.property('foo');
-      helpers._.asyncHelpers.should.have.property('bar');
-
-    });
-
-    it.skip('should load different types of helpers from an array', function () {
-      var helpers = cache();
-
-      var arr = [
-        'test/fixtures/two.js',
-        {
-          foo: function () {
-            return 'hi';
-          }
-        },
-        function () {
-          return {
-            foo: function () {
-              return 'hi';
-            }
-          };
-        },
-        [
-          'test/fixtures/three.js',
-          {
-            bar: function () {
-              return 'hi';
-            }
-          },
-          function () {
-            return {
-              bar: function () {
-                return 'hi';
-              }
-            };
-          }
-        ]
-      ];
-
-      var actual = helpers.addAsyncHelpers(arr);
-      helpers.should.have.property('two');
-      helpers.should.have.property('foo');
-      helpers.should.have.property('three');
-      helpers.should.have.property('bar');
-      helpers._.asyncHelpers.should.have.property('two');
-      helpers._.asyncHelpers.should.have.property('foo');
-      helpers._.asyncHelpers.should.have.property('three');
-      helpers._.asyncHelpers.should.have.property('bar');
-
-    });
-  });
-
-  describe('.addAsyncHelpers()', function () {
-    it.skip('should load helpers from a string', function () {
-      var helpers = cache();
-
-      var str = __dirname + '/fixtures/wrapped/wrapped.js';
-      var actual = helpers.addAsyncHelpers(str);
-      helpers.should.have.property('wrapped');
-    });
-
-    it('should load helpers from a function', function () {
-      var helpers = cache();
-
-      var fn = function () {
-        return {
-          foo: function () {
-            return 'foo';
-          },
-          bar: function () {
-            return 'bar';
-          }
-        };
-      };
-      var actual = helpers.addAsyncHelpers(fn);
-      helpers.should.have.property('foo');
-      helpers.should.have.property('bar');
-      helpers._.asyncHelpers.should.have.property('foo');
-      helpers._.asyncHelpers.should.have.property('bar');
-    });
-
-    it('should load helpers from an object', function () {
-      var helpers = cache();
-
-      var obj = require('./fixtures/wrapped/wrapped.js');
-      var actual = helpers.addAsyncHelpers(obj);
-
-      helpers.should.have.property('wrapped');
-    });
-
-    it('should load helpers from an object', function () {
-      var helpers = cache();
-
-      var obj = {
-        foo: function () {
-          return 'hi';
-        }
-      };
-      var actual = helpers.addAsyncHelpers(obj);
-      helpers.should.have.property('foo');
-      helpers._.asyncHelpers.should.have.property('foo');
-    });
-
-    it('should load helpers from a function', function () {
-      var helpers = cache();
-
-      var fn = require('./fixtures/two.js');
-      var actual = helpers.addAsyncHelpers({ 'two': fn });
-
-      helpers.should.have.property('two');
-      helpers._.asyncHelpers.should.have.property('two');
-    });
-
-    it.skip('should load different types of helpers from an array', function () {
-      var helpers = cache();
-      var arr = [
-        'test/fixtures/two.js',
-        {
-          foo: function () {
-            return 'hi';
-          }
-        },
-        function () {
-          return {
-            foo: function () {
-              return 'hi';
-            }
-          };
-        },
-        [
-          'test/fixtures/three.js',
-          {
-            bar: function () {
-              return 'hi';
-            }
-          },
-          function () {
-            return {
-              bar: function () {
-                return 'hi';
-              }
-            };
-          }
-        ]
-      ];
-
-      var actual = helpers.addAsyncHelpers(arr);
-      helpers.should.have.property('two');
-      helpers.should.have.property('foo');
-      helpers.should.have.property('three');
-      helpers.should.have.property('bar');
-      helpers._.asyncHelpers.should.have.property('two');
-      helpers._.asyncHelpers.should.have.property('foo');
-      helpers._.asyncHelpers.should.have.property('three');
-      helpers._.asyncHelpers.should.have.property('bar');
+      helpers.foo.async.should.be.true;
+      helpers.bar.async.should.be.true;
     });
   });
 });
-
-describe('load functions:', function () {
-  describe('.function():', function () {
-    it('should load helpers from a function', function () {
-      var helpers = cache();
-
-      var fn = function () {
-        return {
-          foo: function () {
-            return 'foo';
-          },
-          bar: function () {
-            return 'bar';
-          }
-        };
-      };
-
-      var actual = helpers.addAsyncHelpers(fn);
-
-      actual.should.have.property('foo');
-      actual.should.have.property('bar');
-      actual._.asyncHelpers.should.have.property('foo');
-      actual._.asyncHelpers.should.have.property('bar');
-
-      var foo = helpers.getHelper('foo');
-      assert.equal(typeof foo, 'function');
-    });
-  });
-});
-

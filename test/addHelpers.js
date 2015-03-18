@@ -33,37 +33,6 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
-  it.skip('should add an object of helpers from a string of glob patterns.', function () {
-    var helpers = cache();
-    helpers.addHelpers('test/fixtures/obj/*.js');
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-  });
-
-  it.skip('should add an object of helpers from an array of file paths.', function () {
-    var helpers = cache();
-    helpers.addHelpers([
-      'test/fixtures/obj/a.js',
-      'test/fixtures/obj/{b,c}.js'
-    ]);
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-  });
-
-  it.skip('should add an object of helpers from an array of glob patterns.', function () {
-    var helpers = cache();
-    helpers.addHelpers(['test/fixtures/obj/*.js']);
-
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
-  });
-
-
   describe('.addHelpers():', function () {
     it('should add an object of helper functions to the cache.', function () {
       var helpers = cache();
@@ -104,58 +73,9 @@ describe('add helper', function () {
       helpers.should.have.property('foo');
       helpers.should.have.property('bar');
     });
-
-    it.skip('should load different types of helpers from an array', function () {
-      var helpers = cache();
-
-      var arr = [
-        'test/fixtures/two.js',
-        {
-          foo: function () {
-            return 'hi';
-          }
-        },
-        function () {
-          return {
-            foo: function () {
-              return 'hi';
-            }
-          };
-        },
-        [
-          'test/fixtures/three.js',
-          {
-            bar: function () {
-              return 'hi';
-            }
-          },
-          function () {
-            return {
-              bar: function () {
-                return 'hi';
-              }
-            };
-          }
-        ]
-      ];
-
-      var actual = helpers.addHelpers(arr);
-      helpers.should.have.property('two');
-      helpers.should.have.property('foo');
-      helpers.should.have.property('three');
-      helpers.should.have.property('bar');
-    });
   });
 
   describe('.addHelpers()', function () {
-    it.skip('should load helpers from a string', function () {
-      var helpers = cache();
-
-      var str = __dirname + '/fixtures/wrapped/wrapped.js';
-      var actual = helpers.addHelpers(str);
-      helpers.should.have.property('wrapped');
-    });
-
     it('should load helpers from a function', function () {
       var helpers = cache();
 
@@ -202,46 +122,6 @@ describe('add helper', function () {
       var actual = helpers.addHelpers({ 'two': fn });
 
       helpers.should.have.property('two');
-    });
-
-    it.skip('should load different types of helpers from an array', function () {
-      var helpers = cache();
-      var arr = [
-        'test/fixtures/two.js',
-        {
-          foo: function () {
-            return 'hi';
-          }
-        },
-        function () {
-          return {
-            foo: function () {
-              return 'hi';
-            }
-          };
-        },
-        [
-          'test/fixtures/three.js',
-          {
-            bar: function () {
-              return 'hi';
-            }
-          },
-          function () {
-            return {
-              bar: function () {
-                return 'hi';
-              }
-            };
-          }
-        ]
-      ];
-
-      var actual = helpers.addHelpers(arr);
-      helpers.should.have.property('two');
-      helpers.should.have.property('foo');
-      helpers.should.have.property('three');
-      helpers.should.have.property('bar');
     });
   });
 });

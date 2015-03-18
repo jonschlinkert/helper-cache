@@ -24,7 +24,9 @@ describe('get async helpers', function () {
         callback(null, str);
       });
 
-      var keys = Object.keys(helper._.asyncHelpers);
+      var keys = Object.keys(helper).filter(function (key) {
+        return helper[key].async;
+      });
       keys.should.have.length(2);
     });
 
@@ -45,11 +47,13 @@ describe('get async helpers', function () {
           callback(null, str);
         }
       });
-      var a = helper.getAsyncHelper('a');
-      var b = helper.getAsyncHelper('b');
+      var a = helper.getHelper('a');
+      var b = helper.getHelper('b');
 
       assert.equal(typeof a, 'function');
       assert.equal(typeof b, 'function');
+      assert.equal(a.async, true);
+      assert.equal(b.async, true);
     });
   });
 });
