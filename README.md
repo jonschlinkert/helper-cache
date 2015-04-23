@@ -1,4 +1,4 @@
-# helper-cache [![NPM version](https://badge.fury.io/js/helper-cache.svg)](http://badge.fury.io/js/helper-cache)
+# helper-cache [![NPM version](https://badge.fury.io/js/helper-cache.svg)](http://badge.fury.io/js/helper-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/helper-cache.svg)](https://travis-ci.org/jonschlinkert/helper-cache)
 
 > Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.
 
@@ -10,7 +10,7 @@ npm i helper-cache --save
 
 ## Usage
 
-### [Helpers](index.js#L30)
+### [Helpers](index.js#L27)
 
 Create an instance of `Helpers`, optionally passing default `options`.
 
@@ -24,12 +24,13 @@ var Helpers = require('helper-cache');
 var helpers = new Helpers();
 ```
 
-### [addHelper](index.js#L66)
+### [.addHelper](index.js#L59)
 
 Register a helper.
 
 * `name` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
 
 ```js
 helpers.addHelper('lower', function(str) {
@@ -37,12 +38,13 @@ helpers.addHelper('lower', function(str) {
 });
 ```
 
-### [addAsyncHelper](index.js#L99)
+### [.addAsyncHelper](index.js#L102)
 
 Register an async helper.
 
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
 
 ```js
 helpers.addAsyncHelper('foo', function (str, callback) {
@@ -50,18 +52,15 @@ helpers.addAsyncHelper('foo', function (str, callback) {
 });
 ```
 
-### [addHelpers](index.js#L148)
+### [.addHelpers](index.js#L141)
 
-Load a glob or object of helpers.
+Load an object of helpers.
 
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining.  
 
 ```js
-// glob patterns
-helpers.addHelpers('helpers/*.js');
-helpers.addHelpers(['helpers/a.js', 'helpers/{b,c}.js']);
-// object of helper functions
 helpers.addHelpers({
   a: function() {},
   b: function() {},
@@ -69,20 +68,15 @@ helpers.addHelpers({
 });
 ```
 
-See [load-helpers] for issues, API details and the full range of options.
+### [.addAsyncHelpers](index.js#L184)
 
-### [addAsyncHelpers](index.js#L193)
-
-Load a glob or object of async helpers.
+Load an object of async helpers.
 
 * `key` **{String}**: The name of the helper.    
 * `fn` **{Function}**: Helper function.    
+* `returns` **{Object}**: Return `this` to enable chaining  
 
 ```js
-// glob patterns
-helpers.addAsyncHelpers('helpers/*.js');
-helpers.addAsyncHelpers(['helpers/a.js', 'helpers/{b,c}.js']);
-// object of helper functions
 helpers.addAsyncHelpers({
   a: function() {},
   b: function() {},
@@ -90,9 +84,7 @@ helpers.addAsyncHelpers({
 });
 ```
 
-See [load-helpers] for issues, API details and the full range of options.
-
-### [getHelper](index.js#L216)
+### [.getHelper](index.js#L211)
 
 Get a registered helper.
 
@@ -103,45 +95,27 @@ Get a registered helper.
 helpers.getHelper('foo');
 ```
 
-### [getAsyncHelper](index.js#L238)
+## Related projects
+* [engine-cache](https://github.com/jonschlinkert/engine-cache): express.js inspired template-engine manager.
+* [handlebars-helpers](https://github.com/assemble/handlebars-helpers): 120+ Handlebars helpers in ~20 categories, for Assemble, YUI, Ghost… [more](https://github.com/assemble/handlebars-helpers)
+* [template-helpers](https://github.com/jonschlinkert/template-helpers): Generic JavaScript helpers that can be used with any template… [more](https://github.com/jonschlinkert/template-helpers)
+* [template](https://github.com/jonschlinkert/template): Render templates from any engine. Make custom template types, use… [more](https://github.com/jonschlinkert/template)
 
-Get a registered async helper.
+## Running tests
+Install dev dependencies:
 
-* `key` **{String}**: The helper to get.    
-* `returns` **{Object}**: The specified helper. If no `key` is passed, the entire cache is returned.  
-
-```js
-helpers.getAsyncHelper('foo');
+```bash
+npm i -d && npm test
 ```
 
-### [resolveHelper](index.js#L265)
-
-Getter method to resolve async helper values that were called during the render process. Rendering is done by whatever engine you've registered the helpers with.
-
-* `content` **{String}**: Rendered string containing async ids    
-* `cb` **{Function}**    
-
-```js
-helper.resolveHelper(str, function (err, content) {
-  if (err) return done(err);
-  // do stuff with `content`
-  done();
-});
-```
-
+## Contributing
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/helper-cache/issues)
 
 ## Author
- 
 **Jon Schlinkert**
- 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert) 
- 
-**Brian Woodward**
- 
-+ [github/doowb](https://github.com/doowb)
-+ [twitter/doowb](http://twitter.com/doowb) 
 
++ [github/jonschlinkert](https://github.com/jonschlinkert)
++ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
 Copyright (c) 2014-2015 Jon Schlinkert  
@@ -149,7 +123,7 @@ Released under the MIT license
 
 ***
 
-_This file was generated by [verb](https://github.com/assemble/verb) on February 14, 2015._
+_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on April 23, 2015._
 
 
 [load-helpers]: https://github.com/assemble/load-helpers
