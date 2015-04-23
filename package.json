@@ -35,16 +35,16 @@
     "test": "mocha"
   },
   "dependencies": {
-    "lodash": "^2.4.1"
+    "lodash": "^3.7.0"
   },
   "devDependencies": {
-    "extend-shallow": "^0.2.0",
-    "globby": "^1.1.0",
+    "extend-shallow": "^1.1.2",
+    "globby": "^2.0.0",
     "kind-of": "^1.1.0",
-    "loader-cache": "^0.3.1",
-    "mocha": "*",
-    "object.reduce": "^0.1.3",
-    "should": "*"
+    "loader-cache": "^0.4.0",
+    "mocha": "^2.2.4",
+    "object.reduce": "^0.1.6",
+    "should": "^6.0.1"
   },
   "keywords": [
     "consolidate",
