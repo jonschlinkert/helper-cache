@@ -1,8 +1,8 @@
 /*!
  * helper-cache <https://github.com/jonschlinkert/helper-cache>
  *
- * Copyright (c) 2014-2015, Jon Schlinkert.
- * Licensed under the MIT License.
+ * Copyright (c) 2014-2015 Jon Schlinkert, Brian Woodward
+ * Licensed under the MIT license.
  */
 
 'use strict';
@@ -10,12 +10,12 @@
 var _ = require('lodash');
 
 /**
- * Create an instance of `Helpers`, optionally passing
+ * Create an instance of `HelperCache`, optionally passing
  * default `options`.
  *
  * ```js
- * var Helpers = require('helper-cache');
- * var helpers = new Helpers();
+ * var HelperCache = require('helper-cache');
+ * var helpers = new HelperCache();
  * ```
  *
  * @param {Object} `options` Default options to use.
@@ -24,21 +24,15 @@ var _ = require('lodash');
  * @api public
  */
 
-function Helpers(options) {
-  if (!(this instanceof Helpers)) {
-    return new Helpers(options);
+function HelperCache(opts) {
+  if (!(this instanceof HelperCache)) {
+    return new HelperCache(opts);
   }
 
-  var opts = _.defaults({}, options, {
-    bind: false,
-    thisArg: null
-  });
-
   defineGetter(this, 'options', function () {
-    return opts;
+    return _.extend({bind: false, thisArg: null }, opts);
   });
 }
-
 
 /**
  * Register a helper.
@@ -56,7 +50,7 @@ function Helpers(options) {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addHelper', function () {
+defineGetter(HelperCache.prototype, 'addHelper', function () {
   return function (name, fn, thisArg) {
     thisArg = thisArg || this.options.thisArg;
 
@@ -82,7 +76,6 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
   }.bind(this);
 });
 
-
 /**
  * Register an async helper.
  *
@@ -99,7 +92,7 @@ defineGetter(Helpers.prototype, 'addHelper', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
+defineGetter(HelperCache.prototype, 'addAsyncHelper', function () {
   return function(key, fn, thisArg) {
     // `addAsyncHelpers` handles functions
     if (typeof key === 'function') {
@@ -108,7 +101,7 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
 
     // pass each key/value pair to `addAsyncHelper`
     if (typeof key !== 'string') {
-      _.forOwn(key, function (value, k) {
+      _.forIn(key, function (value, k) {
         this.addAsyncHelper(k, value, thisArg);
       }, this);
     } else {
@@ -116,9 +109,8 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
       this.addHelper(key, fn, thisArg);
     }
     return this;
-  }
+  }.bind(this);
 });
-
 
 /**
  * Load an object of helpers.
@@ -138,7 +130,7 @@ defineGetter(Helpers.prototype, 'addAsyncHelper', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addHelpers', function () {
+defineGetter(HelperCache.prototype, 'addHelpers', function () {
   return function (helpers, thisArg) {
     thisArg = thisArg || this.options.thisArg;
 
@@ -162,7 +154,6 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
   }.bind(this);
 });
 
-
 /**
  * Load an object of async helpers.
  *
@@ -181,7 +172,7 @@ defineGetter(Helpers.prototype, 'addHelpers', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
+defineGetter(HelperCache.prototype, 'addAsyncHelpers', function () {
   return function (helpers, thisArg) {
     // when a function is passed, execute it and use the results
     if (typeof helpers === 'function') {
@@ -193,7 +184,6 @@ defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
     return this.addAsyncHelper(helpers, thisArg);
   }.bind(this);
 });
-
 
 /**
  * Get a registered helper.
@@ -208,7 +198,7 @@ defineGetter(Helpers.prototype, 'addAsyncHelpers', function () {
  * @api public
  */
 
-defineGetter(Helpers.prototype, 'getHelper', function () {
+defineGetter(HelperCache.prototype, 'getHelper', function () {
   return function(key) {
     if (!key) {
       return this;
@@ -236,5 +226,8 @@ function defineGetter(obj, name, getter) {
   });
 }
 
+/**
+ * Expose `HelperCache`
+ */
 
-module.exports = Helpers;
+module.exports = HelperCache;
