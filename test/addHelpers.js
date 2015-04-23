@@ -33,6 +33,59 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
+  it('should add a namespaced object of helpers to the cache', function () {
+    var helpers = cache();
+
+    helpers.addHelpers({
+      fn: {
+        a: function (str) {
+          return str;
+        },
+        b: function (str) {
+          return str;
+        },
+        c: function (str) {
+          return str;
+        },
+        d: function (str) {
+          return str;
+        }
+      }
+    });
+
+    Object.keys(helpers.fn).should.have.length(4);
+  });
+
+  it('should bind thisArg when passed on the constructor options:', function () {
+    var helpers = cache({bind: true, thisArg: {one: 1, two: 2}});
+
+    helpers.addHelpers({
+      fn: {
+        a: function (str) {
+          this.should.have.properties('one', 'two');
+          return str;
+        }
+      }
+    });
+
+    helpers.fn.a();
+  });
+
+  it('should bind thisArg when passed as the last arg to the method:', function () {
+    var helpers = cache({bind: true});
+
+    helpers.addHelpers({
+      fn: {
+        a: function (str) {
+          this.should.have.properties('one', 'two');
+          return str;
+        }
+      }
+    }, {one: 1, two: 2});
+
+    helpers.fn.a();
+  });
+
   describe('.addHelpers():', function () {
     it('should add an object of helper functions to the cache.', function () {
       var helpers = cache();
@@ -52,8 +105,7 @@ describe('add helper', function () {
         }
       });
 
-      var keys = Object.keys(helpers);
-      keys.should.have.length(4);
+      Object.keys(helpers).should.have.length(4);
     });
 
     it('should load helpers from a function', function () {

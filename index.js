@@ -59,13 +59,24 @@ defineGetter(HelperCache.prototype, 'addHelper', function () {
       return this.addHelpers.call(this, arguments);
     }
 
-    if (typeof name !== 'string') {
-      _.extend(this, name);
+    if (typeof name === 'object') {
+      for (var key in name) {
+        this.addHelper(key, name[key], thisArg);
+      }
     } else {
-
       // when `thisArg` and binding is turned on
-      if (thisArg && this.options.bind) {
-        this[name] = _.bind(fn, thisArg);
+      if (this.options.bind && typeof thisArg === 'object') {
+        if (typeof fn === 'object') {
+          var res = {};
+          for (var prop in fn) {
+            if (fn.hasOwnProperty(prop)) {
+              res[prop] = _.bind(fn[prop], thisArg);
+            }
+          }
+          this[name] = res;
+        } else {
+          this[name] = _.bind(fn, thisArg);
+        }
       } else {
         this[name] = fn;
       }
@@ -93,21 +104,42 @@ defineGetter(HelperCache.prototype, 'addHelper', function () {
  */
 
 defineGetter(HelperCache.prototype, 'addAsyncHelper', function () {
-  return function(key, fn, thisArg) {
+  return function(name, fn, thisArg) {
     // `addAsyncHelpers` handles functions
-    if (typeof key === 'function') {
+    if (typeof name === 'function') {
       return this.addAsyncHelpers.call(this, arguments);
     }
 
     // pass each key/value pair to `addAsyncHelper`
-    if (typeof key !== 'string') {
-      _.forIn(key, function (value, k) {
-        this.addAsyncHelper(k, value, thisArg);
-      }, this);
+    if (typeof name === 'object') {
+      for (var key in name) {
+        if (name.hasOwnProperty(key)) {
+          this.addAsyncHelper(key, name[key], thisArg);
+        }
+      }
     } else {
-      fn.async = true;
-      this.addHelper(key, fn, thisArg);
+      // when `thisArg` and binding is turned on
+      if (this.options.bind && typeof thisArg === 'object') {
+        if (typeof fn === 'object') {
+          var res = {};
+          for (var prop in fn) {
+            if (fn.hasOwnProperty(prop)) {
+              var val = fn[prop];
+              val.async = true;
+              res[prop] = _.bind(val, thisArg);
+            }
+          }
+          this[name] = res;
+        } else {
+          fn.async = true;
+          this[name] = _.bind(fn, thisArg);
+        }
+      } else {
+        fn.async = true;
+        this[name] = fn;
+      }
     }
+
     return this;
   }.bind(this);
 });
@@ -140,17 +172,12 @@ defineGetter(HelperCache.prototype, 'addHelpers', function () {
     }
 
     // allow binding each helper if enabled
-    var o = {};
-    _.forIn(helpers, function (value, key) {
-      if (thisArg && this.options.bind) {
-        o[key] = _.bind(value, thisArg);
-      } else {
-        o[key] = value;
+    for (var key in helpers) {
+      if (helpers.hasOwnProperty(key)) {
+        this.addHelper(key, helpers[key], thisArg);
       }
-    }, this);
-
-    // use `addHelper` to extend the object
-    return this.addHelper(o);
+    }
+    return this;
   }.bind(this);
 });
 
@@ -180,8 +207,14 @@ defineGetter(HelperCache.prototype, 'addAsyncHelpers', function () {
       return this.addAsyncHelpers(helpers(thisArg), thisArg);
     }
 
-    // use `addAsyncHelper` to extend the object
-    return this.addAsyncHelper(helpers, thisArg);
+    if (typeof helpers === 'object') {
+      for (var key in helpers) {
+        if (helpers.hasOwnProperty(key)) {
+          this.addAsyncHelper(key, helpers[key], thisArg);
+        }
+      }
+    }
+    return this;
   }.bind(this);
 });
 
@@ -200,10 +233,7 @@ defineGetter(HelperCache.prototype, 'addAsyncHelpers', function () {
 
 defineGetter(HelperCache.prototype, 'getHelper', function () {
   return function(key) {
-    if (!key) {
-      return this;
-    }
-    return this[key];
+    return typeof key === 'string' ? this[key] : this;
   }.bind(this);
 });
 
@@ -222,7 +252,9 @@ function defineGetter(obj, name, getter) {
     configurable: false,
     enumerable: false,
     get: getter,
-    set: function() {}
+    set: function() {
+      throw new Error(name + ' is a read-only getter.');
+    }
   });
 }
 
