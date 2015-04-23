@@ -10,9 +10,9 @@ npm i helper-cache --save
 
 ## Usage
 
-### [Helpers](index.js#L27)
+### [HelperCache](index.js#L27)
 
-Create an instance of `Helpers`, optionally passing default `options`.
+Create an instance of `HelperCache`, optionally passing default `options`.
 
 * `options` **{Object}**: Default options to use.  
     - `bind` **{Boolean}**: Bind functions to `this`. Defaults to `false`.
@@ -20,11 +20,11 @@ Create an instance of `Helpers`, optionally passing default `options`.
       
 
 ```js
-var Helpers = require('helper-cache');
-var helpers = new Helpers();
+var HelperCache = require('helper-cache');
+var helpers = new HelperCache();
 ```
 
-### [.addHelper](index.js#L59)
+### [.addHelper](index.js#L53)
 
 Register a helper.
 
@@ -38,7 +38,7 @@ helpers.addHelper('lower', function(str) {
 });
 ```
 
-### [.addAsyncHelper](index.js#L102)
+### [.addAsyncHelper](index.js#L106)
 
 Register an async helper.
 
@@ -52,7 +52,7 @@ helpers.addAsyncHelper('foo', function (str, callback) {
 });
 ```
 
-### [.addHelpers](index.js#L141)
+### [.addHelpers](index.js#L165)
 
 Load an object of helpers.
 
@@ -68,7 +68,7 @@ helpers.addHelpers({
 });
 ```
 
-### [.addAsyncHelpers](index.js#L184)
+### [.addAsyncHelpers](index.js#L202)
 
 Load an object of async helpers.
 
@@ -84,7 +84,7 @@ helpers.addAsyncHelpers({
 });
 ```
 
-### [.getHelper](index.js#L211)
+### [.getHelper](index.js#L234)
 
 Get a registered helper.
 
