@@ -1,12 +1,9 @@
 {
   "name": "helper-cache",
   "description": "Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
-  "author": {
-    "name": "Jon Schlinkert",
-    "url": "https://github.com/jonschlinkert"
-  },
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "maintainers": [
     {
       "name": "Brian Woodward",
@@ -20,10 +17,7 @@
   "bugs": {
     "url": "https://github.com/jonschlinkert/helper-cache/issues"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/jonschlinkert/helper-cache/blob/master/LICENSE"
-  },
+  "license": "MIT",
   "files": [
     "index.js"
   ],
@@ -34,18 +28,6 @@
   "scripts": {
     "test": "mocha"
   },
-  "dependencies": {
-    "lodash": "^3.7.0"
-  },
-  "devDependencies": {
-    "extend-shallow": "^1.1.2",
-    "globby": "^2.0.0",
-    "kind-of": "^1.1.0",
-    "loader-cache": "^0.4.0",
-    "mocha": "^2.2.4",
-    "object.reduce": "^0.1.6",
-    "should": "^6.0.1"
-  },
   "keywords": [
     "consolidate",
     "engine",
@@ -54,5 +36,17 @@
     "template",
     "lo-dash",
     "lodash"
-  ]
+  ],
+  "dependencies": {
+    "extend-shallow": "^1.1.4",
+    "lodash.bind": "^3.1.0"
+  },
+  "devDependencies": {
+    "globby": "^2.0.0",
+    "kind-of": "^2.0.0",
+    "loader-cache": "^0.4.0",
+    "mocha": "^2.2.5",
+    "object.reduce": "^0.1.7",
+    "should": "^6.0.3"
+  }
 }
