@@ -1,13 +1,7 @@
-/*!
- * helper-cache <https://github.com/jonschlinkert/helper-cache>
- *
- * Copyright (c) 2014-2015 Jon Schlinkert, Brian Woodward
- * Licensed under the MIT license.
- */
-
 'use strict';
 
-var _ = require('lodash');
+var extend = require('extend-shallow');
+var bind = require('lodash.bind');
 
 /**
  * Create an instance of `HelperCache`, optionally passing
@@ -30,7 +24,7 @@ function HelperCache(opts) {
   }
 
   defineGetter(this, 'options', function () {
-    return _.extend({bind: false, thisArg: null }, opts);
+    return extend({bind: false, thisArg: null }, opts);
   });
 }
 
@@ -70,12 +64,12 @@ defineGetter(HelperCache.prototype, 'addHelper', function () {
           var res = {};
           for (var prop in fn) {
             if (fn.hasOwnProperty(prop)) {
-              res[prop] = _.bind(fn[prop], thisArg);
+              res[prop] = bind(fn[prop], thisArg);
             }
           }
           this[name] = res;
         } else {
-          this[name] = _.bind(fn, thisArg);
+          this[name] = bind(fn, thisArg);
         }
       } else {
         this[name] = fn;
@@ -126,13 +120,13 @@ defineGetter(HelperCache.prototype, 'addAsyncHelper', function () {
             if (fn.hasOwnProperty(prop)) {
               var val = fn[prop];
               val.async = true;
-              res[prop] = _.bind(val, thisArg);
+              res[prop] = bind(val, thisArg);
             }
           }
           this[name] = res;
         } else {
           fn.async = true;
-          this[name] = _.bind(fn, thisArg);
+          this[name] = bind(fn, thisArg);
         }
       } else {
         fn.async = true;
