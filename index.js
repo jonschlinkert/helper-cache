@@ -1,7 +1,8 @@
 'use strict';
 
-var extend = require('extend-shallow');
-var bind = require('lodash.bind');
+var lazy = require('lazy-cache')(require);
+lazy('extend-shallow', 'extend');
+lazy('lodash.bind', 'bind');
 
 /**
  * Create an instance of `HelperCache`, optionally passing
@@ -24,7 +25,7 @@ function HelperCache(opts) {
   }
 
   defineGetter(this, 'options', function () {
-    return extend({bind: false, thisArg: null }, opts);
+    return lazy.extend({bind: false, thisArg: null }, opts);
   });
 }
 
@@ -64,12 +65,12 @@ defineGetter(HelperCache.prototype, 'addHelper', function () {
           var res = {};
           for (var prop in fn) {
             if (fn.hasOwnProperty(prop)) {
-              res[prop] = bind(fn[prop], thisArg);
+              res[prop] = lazy.bind(fn[prop], thisArg);
             }
           }
           this[name] = res;
         } else {
-          this[name] = bind(fn, thisArg);
+          this[name] = lazy.bind(fn, thisArg);
         }
       } else {
         this[name] = fn;
@@ -120,13 +121,13 @@ defineGetter(HelperCache.prototype, 'addAsyncHelper', function () {
             if (fn.hasOwnProperty(prop)) {
               var val = fn[prop];
               val.async = true;
-              res[prop] = bind(val, thisArg);
+              res[prop] = lazy.bind(val, thisArg);
             }
           }
           this[name] = res;
         } else {
           fn.async = true;
-          this[name] = bind(fn, thisArg);
+          this[name] = lazy.bind(fn, thisArg);
         }
       } else {
         fn.async = true;
