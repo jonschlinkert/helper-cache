@@ -1,260 +1,164 @@
 'use strict';
 
-var lazy = require('lazy-cache')(require);
-lazy('extend-shallow', 'extend');
-lazy('lodash.bind', 'bind');
+var base = require('base-methods');
+var Base = base.namespace('cache');
 
 /**
- * Create an instance of `HelperCache`, optionally passing
- * default `options`.
+ * Create an instance of `HelperCache` with the given `options.`
  *
  * ```js
- * var HelperCache = require('helper-cache');
- * var helpers = new HelperCache();
+ * var App = require('helper-cache');
+ * var app = new App();
  * ```
- *
- * @param {Object} `options` Default options to use.
- *   @option {Boolean} [options] `bind` Bind functions to `this`. Defaults to `false`.
- *   @option {Boolean} [options] `thisArg` The context to use.
+ * @param {Object} `options`
  * @api public
  */
 
-function HelperCache(opts) {
+function HelperCache(options) {
   if (!(this instanceof HelperCache)) {
-    return new HelperCache(opts);
+    return new HelperCache(options);
   }
-
-  defineGetter(this, 'options', function () {
-    return lazy.extend({bind: false, thisArg: null }, opts);
-  });
+  Base.call(this);
+  this.options = options || {};
+  this.cache = {};
 }
 
 /**
- * Register a helper.
+ * Inherit `base-methods`
+ */
+
+Base.extend(HelperCache);
+
+/**
+ * Register a sync template helper `fn` as `name`.
  *
  * ```js
- * helpers.addHelper('lower', function(str) {
- *   return str.toLowerCase();
+ * app.helper('uppercase', function(str) {
+ *   return str.toUpperCase();
  * });
  * ```
- *
- * @name .addHelper
- * @param {String} `name` The name of the helper.
- * @param {Function} `fn` Helper function.
- * @return {Object} Return `this` to enable chaining
+ * @param {String} `name`
+ * @param {Function} `fn`
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
  * @api public
  */
 
-defineGetter(HelperCache.prototype, 'addHelper', function () {
-  return function (name, fn, thisArg) {
-    thisArg = thisArg || this.options.thisArg;
-
-    // `addHelpers` handles functions
-    if (typeof name === 'function') {
-      return this.addHelpers.call(this, arguments);
-    }
-
-    if (typeof name === 'object') {
-      for (var key in name) {
-        this.addHelper(key, name[key], thisArg);
-      }
-    } else {
-      // when `thisArg` and binding is turned on
-      if (this.options.bind && typeof thisArg === 'object') {
-        if (typeof fn === 'object') {
-          var res = {};
-          for (var prop in fn) {
-            if (fn.hasOwnProperty(prop)) {
-              res[prop] = lazy.bind(fn[prop], thisArg);
-            }
-          }
-          this[name] = res;
-        } else {
-          this[name] = lazy.bind(fn, thisArg);
-        }
-      } else {
-        this[name] = fn;
-      }
-    }
-
-    // chaining
-    return this;
-  }.bind(this);
-});
+HelperCache.prototype.helper = function (name, fn) {
+  if (isObject(name)) {
+    return this.visit('helper', name);
+  }
+  this.set(name, fn);
+  return this;
+};
 
 /**
- * Register an async helper.
+ * Register multiple sync helpers at once.
  *
  * ```js
- * helpers.addAsyncHelper('foo', function (str, callback) {
- *   callback(null, str + ' foo');
+ * app.helpers({
+ *   foo: function() {},
+ *   bar: function() {},
+ *   baz: function() {}
  * });
  * ```
- *
- * @name .addAsyncHelper
- * @param {String} `key` The name of the helper.
- * @param {Function} `fn` Helper function.
- * @return {Object} Return `this` to enable chaining
+ * @param {Object} `helpers` Array of globs, file paths or key-value pair helper objects.
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
  * @api public
  */
 
-defineGetter(HelperCache.prototype, 'addAsyncHelper', function () {
-  return function(name, fn, thisArg) {
-    // `addAsyncHelpers` handles functions
-    if (typeof name === 'function') {
-      return this.addAsyncHelpers.call(this, arguments);
-    }
-
-    // pass each key/value pair to `addAsyncHelper`
-    if (typeof name === 'object') {
-      for (var key in name) {
-        if (name.hasOwnProperty(key)) {
-          this.addAsyncHelper(key, name[key], thisArg);
-        }
-      }
-    } else {
-      // when `thisArg` and binding is turned on
-      if (this.options.bind && typeof thisArg === 'object') {
-        if (typeof fn === 'object') {
-          var res = {};
-          for (var prop in fn) {
-            if (fn.hasOwnProperty(prop)) {
-              var val = fn[prop];
-              val.async = true;
-              res[prop] = lazy.bind(val, thisArg);
-            }
-          }
-          this[name] = res;
-        } else {
-          fn.async = true;
-          this[name] = lazy.bind(fn, thisArg);
-        }
-      } else {
-        fn.async = true;
-        this[name] = fn;
-      }
-    }
-
-    return this;
-  }.bind(this);
-});
+HelperCache.prototype.helpers = function (helpers) {
+  return this.visit('helper', helpers);
+};
 
 /**
- * Load an object of helpers.
+ * Register an async template helper `fn` as `name`.
  *
  * ```js
- * helpers.addHelpers({
- *   a: function() {},
- *   b: function() {},
- *   c: function() {},
+ * app.helper('uppercase', function(str) {
+ *   return str.toUpperCase();
  * });
  * ```
- *
- * @name .addHelpers
- * @param {String} `key` The name of the helper.
- * @param {Function} `fn` Helper function.
- * @return {Object} Return `this` to enable chaining.
+ * @param {String} `name`
+ * @param {Function} `fn`
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
  * @api public
  */
 
-defineGetter(HelperCache.prototype, 'addHelpers', function () {
-  return function (helpers, thisArg) {
-    thisArg = thisArg || this.options.thisArg;
-
-    // when a function is passed, execute it and use the results
-    if (typeof helpers === 'function') {
-      return this.addHelpers(helpers(thisArg), thisArg);
-    }
-
-    // allow binding each helper if enabled
-    for (var key in helpers) {
-      if (helpers.hasOwnProperty(key)) {
-        this.addHelper(key, helpers[key], thisArg);
-      }
-    }
-    return this;
-  }.bind(this);
-});
+HelperCache.prototype.asyncHelper = function (key, fn) {
+  if (isObject(key)) {
+    return this.visit('asyncHelper', key);
+  }
+  fn.async = true;
+  this.set(key, fn);
+  return this;
+};
 
 /**
- * Load an object of async helpers.
+ * Register multiple async helpers at once.
  *
  * ```js
- * helpers.addAsyncHelpers({
- *   a: function() {},
- *   b: function() {},
- *   c: function() {},
+ * app.asyncHelpers({
+ *   foo: function() {},
+ *   bar: function() {},
+ *   baz: function() {}
  * });
  * ```
- *
- * @name .addAsyncHelpers
- * @param {String} `key` The name of the helper.
- * @param {Function} `fn` Helper function.
- * @return {Object} Return `this` to enable chaining
+ * @param {Object} `helpers` Array of globs, file paths or key-value pair helper objects.
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
  * @api public
  */
 
-defineGetter(HelperCache.prototype, 'addAsyncHelpers', function () {
-  return function (helpers, thisArg) {
-    // when a function is passed, execute it and use the results
-    if (typeof helpers === 'function') {
-      thisArg = thisArg || this.options.thisArg;
-      return this.addAsyncHelpers(helpers(thisArg), thisArg);
-    }
-
-    if (typeof helpers === 'object') {
-      for (var key in helpers) {
-        if (helpers.hasOwnProperty(key)) {
-          this.addAsyncHelper(key, helpers[key], thisArg);
-        }
-      }
-    }
-    return this;
-  }.bind(this);
-});
+HelperCache.prototype.asyncHelpers = function (helpers) {
+  return this.visit('asyncHelper', helpers);
+};
 
 /**
- * Get a registered helper.
+ * Namespace a collection of sync helpers on the given `prop`.
  *
  * ```js
- * helpers.getHelper('foo');
+ * app.group('mdu', require('markdown-utils'));
+ * // Usage: '<%= mdu.heading("My heading") %>'
  * ```
- *
- * @name .getHelper
- * @param  {String} `key` The helper to get.
- * @return {Object} The specified helper. If no `key` is passed, the entire cache is returned.
+ * @name .group
+ * @param {Object|Array} `helpers` Object, array of objects, or glob patterns.
  * @api public
  */
 
-defineGetter(HelperCache.prototype, 'getHelper', function () {
-  return function(key) {
-    return typeof key === 'string' ? this[key] : this;
-  }.bind(this);
-});
+HelperCache.prototype.group = function (prop, helpers) {
+  this.set(prop, helpers);
+  return this;
+};
 
 /**
- * Utility method to define getters.
+ * Namespace a collection of async helpers on the given `prop`.
  *
- * @param  {Object} `obj`
- * @param  {String} `name`
- * @param  {Function} `getter`
- * @return {Getter}
- * @api private
+ * ```js
+ * app.asyncGroup('mdu', require('markdown-utils'));
+ * // Usage: '<%= mdu.heading("My heading") %>'
+ * ```
+ * @name .group
+ * @param {Object|Array} `helpers` Object, array of objects, or glob patterns.
+ * @api public
  */
 
-function defineGetter(obj, name, getter) {
-  Object.defineProperty(obj, name, {
-    configurable: false,
-    enumerable: false,
-    get: getter,
-    set: function() {
-      throw new Error(name + ' is a read-only getter.');
-    }
-  });
-}
+HelperCache.prototype.asyncGroup = function (name, helpers) {
+  for (var key in helpers) {
+    helpers[key].async = true;
+  }
+  this.set(name, helpers);
+  return this;
+};
 
 /**
- * Expose `HelperCache`
+ * Expose `helper-cache`
  */
 
 module.exports = HelperCache;
+
+/**
+ * Return true if a value is an object
+ */
+
+function isObject(val) {
+  return val && typeof val === 'object' && !Array.isArray(val);
+}
