@@ -11,8 +11,8 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-describe('add async helpers', function () {
-  it('should create instance of helper cache', function () {
+describe('add async helpers', function() {
+  it('should create instance of helper cache', function() {
     var actual = cache();
 
     actual.should.be.an.object;
@@ -20,7 +20,7 @@ describe('add async helpers', function () {
     assert.equal(actual instanceof cache, true);
   });
 
-  it('should add an object of helpers to the cache', function () {
+  it('should add an object of helpers to the cache', function() {
     var helpers = cache();
     helpers.addAsyncHelpers({
       a: function() {},
@@ -36,21 +36,21 @@ describe('add async helpers', function () {
     helpers.c.async.should.be.true;
   });
 
-  describe('.addAsyncHelpers():', function () {
-    it('should add an object of helper functions to the cache.', function () {
+  describe('.addAsyncHelpers():', function() {
+    it('should add an object of helper functions to the cache.', function() {
       var helpers = cache();
 
       helpers.addAsyncHelpers({
-        a: function (str) {
+        a: function(str) {
           return str;
         },
-        b: function (str) {
+        b: function(str) {
           return str;
         },
-        c: function (str) {
+        c: function(str) {
           return str;
         },
-        d: function (str) {
+        d: function(str) {
           return str;
         }
       });
@@ -59,15 +59,15 @@ describe('add async helpers', function () {
       keys.should.have.length(4);
     });
 
-    it('should load helpers from a function', function () {
+    it('should load helpers from a function', function() {
       var helpers = cache();
 
-      var fn = function () {
+      var fn = function() {
         return {
-          foo: function () {
+          foo: function() {
             return 'foo';
           },
-          bar: function () {
+          bar: function() {
             return 'bar';
           }
         };

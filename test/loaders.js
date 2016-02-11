@@ -17,24 +17,24 @@ var loader = require('./utils/loader');
 var loaderCache = new LoaderCache();
 loaderCache.register('helpers', loader);
 
-var load = function (helpers) {
+var load = function(helpers) {
   var options = {
-    matchLoader: function () {
+    matchLoader: function() {
       return 'helpers';
     }
   };
   return loaderCache.load(helpers, options);
 };
 
-describe('add helper with loader', function () {
+describe('add helper with loader', function() {
 
-  it('should set helpers from object', function () {
+  it('should set helpers from object', function() {
     var helpers = cache();
     helpers.addHelper(load({
-      foo: function (str) {
+      foo: function(str) {
         return str + ' foo';
       },
-      bar: function (str) {
+      bar: function(str) {
         return str + ' bar';
       }
     }));
@@ -43,7 +43,7 @@ describe('add helper with loader', function () {
     helpers.bar.should.be.a.function;
   });
 
-  it('should set helpers from a glob pattern', function () {
+  it('should set helpers from a glob pattern', function() {
     var helpers = cache();
     helpers.addHelper(load(['test/fixtures/*.js']));
     helpers.one.should.be.a.function;
@@ -51,13 +51,13 @@ describe('add helper with loader', function () {
     helpers.three.should.be.a.function;
   });
 
-  it('should get all helpers as object', function () {
+  it('should get all helpers as object', function() {
     var helpers = cache();
     helpers.addHelper(load({
-      foo: function (str) {
+      foo: function(str) {
         return str + ' foo';
       },
-      bar: function (str) {
+      bar: function(str) {
         return str + ' bar';
       }
     }));

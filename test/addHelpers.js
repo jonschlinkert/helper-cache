@@ -11,8 +11,8 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-describe('add helper', function () {
-  it('should create instance of helper cache', function () {
+describe('add helper', function() {
+  it('should create instance of helper cache', function() {
     var actual = cache('foo');
 
     actual.should.be.an.object;
@@ -20,7 +20,7 @@ describe('add helper', function () {
     assert.equal(actual instanceof cache, true);
   });
 
-  it('should add an object of helpers to the cache', function () {
+  it('should add an object of helpers to the cache', function() {
     var helpers = cache();
     helpers.addHelpers({
       a: function() {},
@@ -33,21 +33,21 @@ describe('add helper', function () {
     helpers.c.should.be.a.function;
   });
 
-  it('should add a namespaced object of helpers to the cache', function () {
+  it('should add a namespaced object of helpers to the cache', function() {
     var helpers = cache();
 
     helpers.addHelpers({
       fn: {
-        a: function (str) {
+        a: function(str) {
           return str;
         },
-        b: function (str) {
+        b: function(str) {
           return str;
         },
-        c: function (str) {
+        c: function(str) {
           return str;
         },
-        d: function (str) {
+        d: function(str) {
           return str;
         }
       }
@@ -56,12 +56,12 @@ describe('add helper', function () {
     Object.keys(helpers.fn).should.have.length(4);
   });
 
-  it('should bind thisArg when passed on the constructor options:', function () {
+  it('should bind thisArg when passed on the constructor options:', function() {
     var helpers = cache({bind: true, thisArg: {one: 1, two: 2}});
 
     helpers.addHelpers({
       fn: {
-        a: function (str) {
+        a: function(str) {
           this.should.have.properties('one', 'two');
           return str;
         }
@@ -71,12 +71,12 @@ describe('add helper', function () {
     helpers.fn.a();
   });
 
-  it('should bind thisArg when passed as the last arg to the method:', function () {
+  it('should bind thisArg when passed as the last arg to the method:', function() {
     var helpers = cache({bind: true});
 
     helpers.addHelpers({
       fn: {
-        a: function (str) {
+        a: function(str) {
           this.should.have.properties('one', 'two');
           return str;
         }
@@ -86,21 +86,21 @@ describe('add helper', function () {
     helpers.fn.a();
   });
 
-  describe('.addHelpers():', function () {
-    it('should add an object of helper functions to the cache.', function () {
+  describe('.addHelpers():', function() {
+    it('should add an object of helper functions to the cache.', function() {
       var helpers = cache();
 
       helpers.addHelpers({
-        a: function (str) {
+        a: function(str) {
           return str;
         },
-        b: function (str) {
+        b: function(str) {
           return str;
         },
-        c: function (str) {
+        c: function(str) {
           return str;
         },
-        d: function (str) {
+        d: function(str) {
           return str;
         }
       });
@@ -108,15 +108,15 @@ describe('add helper', function () {
       Object.keys(helpers).should.have.length(4);
     });
 
-    it('should load helpers from a function', function () {
+    it('should load helpers from a function', function() {
       var helpers = cache();
 
-      var fn = function () {
+      var fn = function() {
         return {
-          foo: function () {
+          foo: function() {
             return 'foo';
           },
-          bar: function () {
+          bar: function() {
             return 'bar';
           }
         };
@@ -127,16 +127,16 @@ describe('add helper', function () {
     });
   });
 
-  describe('.addHelpers()', function () {
-    it('should load helpers from a function', function () {
+  describe('.addHelpers()', function() {
+    it('should load helpers from a function', function() {
       var helpers = cache();
 
-      var fn = function () {
+      var fn = function() {
         return {
-          foo: function () {
+          foo: function() {
             return 'foo';
           },
-          bar: function () {
+          bar: function() {
             return 'bar';
           }
         };
@@ -146,7 +146,7 @@ describe('add helper', function () {
       helpers.should.have.property('bar');
     });
 
-    it('should load helpers from an object', function () {
+    it('should load helpers from an object', function() {
       var helpers = cache();
 
       var obj = require('./fixtures/wrapped/wrapped.js');
@@ -155,11 +155,11 @@ describe('add helper', function () {
       helpers.should.have.property('wrapped');
     });
 
-    it('should load helpers from an object', function () {
+    it('should load helpers from an object', function() {
       var helpers = cache();
 
       var obj = {
-        foo: function () {
+        foo: function() {
           return 'hi';
         }
       };
@@ -167,7 +167,7 @@ describe('add helper', function () {
       helpers.should.have.property('foo');
     });
 
-    it('should load helpers from a function', function () {
+    it('should load helpers from a function', function() {
       var helpers = cache();
 
       var fn = require('./fixtures/two.js');
@@ -178,17 +178,17 @@ describe('add helper', function () {
   });
 });
 
-describe('load functions:', function () {
-  describe('.function():', function () {
-    it('should load helpers from a function', function () {
+describe('load functions:', function() {
+  describe('.function():', function() {
+    it('should load helpers from a function', function() {
       var helpers = cache();
 
-      var fn = function () {
+      var fn = function() {
         return {
-          foo: function () {
+          foo: function() {
             return 'foo';
           },
-          bar: function () {
+          bar: function() {
             return 'bar';
           }
         };

@@ -11,8 +11,8 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-describe('add helper', function () {
-  it('should create instance of helper cache', function () {
+describe('add helper', function() {
+  it('should create instance of helper cache', function() {
     var actual = cache('foo');
 
     actual.should.be.an.object;
@@ -20,23 +20,23 @@ describe('add helper', function () {
     assert.equal(actual instanceof cache, true);
   });
 
-  it('should set a helper by name', function () {
+  it('should set a helper by name', function() {
     var helpers = cache();
-    helpers.addHelper('foo', function (str) {
+    helpers.addHelper('foo', function(str) {
       return str + ' foo';
     });
 
     helpers.foo.should.be.a.function;
   });
 
-  it('should add individual helpers to the cache.', function () {
+  it('should add individual helpers to the cache.', function() {
     var helpers = cache();
 
-    helpers.addHelper('a', function (str) {
+    helpers.addHelper('a', function(str) {
       return str;
     });
 
-    helpers.addHelper('b', function (str) {
+    helpers.addHelper('b', function(str) {
       return str;
     });
 
@@ -44,13 +44,13 @@ describe('add helper', function () {
     keys.should.have.length(2);
   });
 
-  it('should set helpers from object', function () {
+  it('should set helpers from object', function() {
     var helpers = cache();
     helpers.addHelper({
-      foo: function (str) {
+      foo: function(str) {
         return str + ' foo';
       },
-      bar: function (str) {
+      bar: function(str) {
         return str + ' bar';
       }
     });
@@ -59,22 +59,22 @@ describe('add helper', function () {
     helpers.bar.should.be.a.function;
   });
 
-  it('should get a helper by name', function () {
+  it('should get a helper by name', function() {
     var helpers = cache();
-    helpers.addHelper('foo', function (str) {
+    helpers.addHelper('foo', function(str) {
       return str + ' foo';
     });
     var foo = helpers.getHelper('foo');
     helpers.foo.should.be.a.function;
   });
 
-  it('should get all helpers as object', function () {
+  it('should get all helpers as object', function() {
     var helpers = cache();
     helpers.addHelper({
-      foo: function (str) {
+      foo: function(str) {
         return str + ' foo';
       },
-      bar: function (str) {
+      bar: function(str) {
         return str + ' bar';
       }
     });

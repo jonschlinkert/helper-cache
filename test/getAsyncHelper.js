@@ -12,38 +12,38 @@ var assert = require('assert');
 var cache = require('..');
 
 
-describe('get async helpers', function () {
-  describe('.getAsyncHelper():', function () {
-    it('should get helpers from the cache.', function () {
+describe('get async helpers', function() {
+  describe('.getAsyncHelper():', function() {
+    it('should get helpers from the cache.', function() {
       var helper = cache();
 
-      helper.addAsyncHelper('a', function (str, callback) {
+      helper.addAsyncHelper('a', function(str, callback) {
         callback(null, str);
       });
-      helper.addAsyncHelper('b', function (str, callback) {
+      helper.addAsyncHelper('b', function(str, callback) {
         callback(null, str);
       });
 
-      var keys = Object.keys(helper).filter(function (key) {
+      var keys = Object.keys(helper).filter(function(key) {
         return helper[key].async;
       });
       keys.should.have.length(2);
     });
 
-    it('should get `load`ed helpers from the cache', function () {
+    it('should get `load`ed helpers from the cache', function() {
       var helper = cache();
 
       helper.addAsyncHelpers({
-        a: function (str, callback) {
+        a: function(str, callback) {
           callback(null, str);
         },
-        b: function (str, callback) {
+        b: function(str, callback) {
           callback(null, str);
         },
-        c: function (str, callback) {
+        c: function(str, callback) {
           callback(null, str);
         },
-        d: function (str, callback) {
+        d: function(str, callback) {
           callback(null, str);
         }
       });

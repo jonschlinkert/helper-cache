@@ -3,14 +3,11 @@
   "description": "Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.",
   "version": "0.7.2",
   "homepage": "https://github.com/jonschlinkert/helper-cache",
-  "repository": "jonschlinkert/helper-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "maintainers": [
-    {
-      "name": "Brian Woodward",
-      "url": "https://github.com/doowb"
-    }
+    "Brian Woodward (https://github.com/doowb)"
   ],
+  "repository": "jonschlinkert/helper-cache",
   "bugs": {
     "url": "https://github.com/jonschlinkert/helper-cache/issues"
   },
@@ -25,17 +22,7 @@
   "scripts": {
     "test": "mocha"
   },
-  "keywords": [
-    "consolidate",
-    "engine",
-    "helper",
-    "helpers",
-    "template",
-    "lo-dash",
-    "lodash"
-  ],
   "dependencies": {
-    "base-methods": "^0.2.10",
     "extend-shallow": "^2.0.1",
     "load-helpers": "^0.2.8"
   },
@@ -43,8 +30,27 @@
     "globby": "^2.0.0",
     "kind-of": "^2.0.0",
     "loader-cache": "^0.4.0",
-    "mocha": "^2.2.5",
+    "mocha": "*",
     "object.reduce": "^0.1.7",
-    "should": "^6.0.3"
+    "should": "*"
+  },
+  "keywords": [
+    "consolidate",
+    "engine",
+    "helper",
+    "helpers",
+    "lo-dash",
+    "lodash",
+    "template"
+  ],
+  "verb": {
+    "related": {
+      "list": [
+        "template",
+        "engine-cache",
+        "handlebars-helpers",
+        "template-helpers"
+      ]
+    }
   }
 }

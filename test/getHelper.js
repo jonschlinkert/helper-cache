@@ -12,15 +12,15 @@ var assert = require('assert');
 var cache = require('..');
 
 
-describe('get helpers', function () {
-  describe('.getHelper():', function () {
-    it('should get helpers from the cache.', function () {
+describe('get helpers', function() {
+  describe('.getHelper():', function() {
+    it('should get helpers from the cache.', function() {
       var helper = cache();
 
-      helper.addHelper('a', function (str) {
+      helper.addHelper('a', function(str) {
         return str;
       });
-      helper.addHelper('b', function (str) {
+      helper.addHelper('b', function(str) {
         return str;
       });
 
@@ -28,20 +28,20 @@ describe('get helpers', function () {
       keys.should.have.length(2);
     });
 
-    it('should get `load`ed helpers from the cache', function () {
+    it('should get `load`ed helpers from the cache', function() {
       var helper = cache();
 
       helper.addHelpers({
-        a: function (str) {
+        a: function(str) {
           return str;
         },
-        b: function (str) {
+        b: function(str) {
           return str;
         },
-        c: function (str) {
+        c: function(str) {
           return str;
         },
-        d: function (str) {
+        d: function(str) {
           return str;
         }
       });
