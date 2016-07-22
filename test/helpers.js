@@ -9,34 +9,49 @@
 
 var should = require('should');
 var assert = require('assert');
-var cache = require('..');
+var Cache = require('..');
 
 describe('add helper', function() {
   it('should create instance of helper cache', function() {
-    var actual = cache('foo');
+    var app = new Cache();
 
-    actual.should.be.an.object;
-    actual.should.be.instanceof.cache;
-    assert.equal(actual instanceof cache, true);
+    assert(app);
+    assert.equal(typeof app, 'object');
+    assert(app instanceof Cache);
+  });
+
+  it('should add helpers', function() {
+    var app = new Cache();
+    app.helpers({
+      foo: function(str) {
+        return str + ' foo';
+      },
+      bar: function(str) {
+        return str + ' bar';
+      }
+    });
+
+    assert.equal(typeof app.cache.foo, 'function');
+    assert.equal(typeof app.cache.bar, 'function');
   });
 
   it('should add an object of helpers to the cache', function() {
-    var helpers = cache();
-    helpers.addHelpers({
+    var app = new Cache();
+    app.helpers({
       a: function() {},
       b: function() {},
       c: function() {},
     });
 
-    helpers.a.should.be.a.function;
-    helpers.b.should.be.a.function;
-    helpers.c.should.be.a.function;
+    assert.equal(typeof app.cache.a, 'function');
+    assert.equal(typeof app.cache.b, 'function');
+    assert.equal(typeof app.cache.c, 'function');
   });
 
   it('should add a namespaced object of helpers to the cache', function() {
-    var helpers = cache();
+    var app = new Cache();
 
-    helpers.addHelpers({
+    app.helpers({
       fn: {
         a: function(str) {
           return str;
@@ -53,13 +68,13 @@ describe('add helper', function() {
       }
     });
 
-    Object.keys(helpers.fn).should.have.length(4);
+    assert.equal(Object.keys(app.cache.fn).length, 4);
   });
 
-  it('should bind thisArg when passed on the constructor options:', function() {
-    var helpers = cache({bind: true, thisArg: {one: 1, two: 2}});
+  it.skip('should bind thisArg when passed on the constructor options:', function() {
+    var app = new Cache({bind: true, thisArg: {one: 1, two: 2}});
 
-    helpers.addHelpers({
+    app.helpers({
       fn: {
         a: function(str) {
           this.should.have.properties('one', 'two');
@@ -68,13 +83,13 @@ describe('add helper', function() {
       }
     });
 
-    helpers.fn.a();
+    app.cache.fn.a();
   });
 
-  it('should bind thisArg when passed as the last arg to the method:', function() {
-    var helpers = cache({bind: true});
+  it.skip('should bind thisArg when passed as the last arg to the method:', function() {
+    var app = new Cache({bind: true});
 
-    helpers.addHelpers({
+    app.helpers({
       fn: {
         a: function(str) {
           this.should.have.properties('one', 'two');
@@ -83,14 +98,14 @@ describe('add helper', function() {
       }
     }, {one: 1, two: 2});
 
-    helpers.fn.a();
+    app.cache.fn.a();
   });
 
-  describe('.addHelpers():', function() {
+  describe('.helpers():', function() {
     it('should add an object of helper functions to the cache.', function() {
-      var helpers = cache();
+      var app = new Cache();
 
-      helpers.addHelpers({
+      app.helpers({
         a: function(str) {
           return str;
         },
@@ -105,11 +120,11 @@ describe('add helper', function() {
         }
       });
 
-      Object.keys(helpers).should.have.length(4);
+      assert.equal(Object.keys(app.cache).length, 4);
     });
 
     it('should load helpers from a function', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var fn = function() {
         return {
@@ -121,15 +136,16 @@ describe('add helper', function() {
           }
         };
       };
-      var actual = helpers.addHelpers(fn);
-      helpers.should.have.property('foo');
-      helpers.should.have.property('bar');
+
+      var actual = app.helpers(fn);
+      assert(app.cache.hasOwnProperty('foo'));
+      assert(app.cache.hasOwnProperty('bar'));
     });
   });
 
-  describe('.addHelpers()', function() {
+  describe('.helpers()', function() {
     it('should load helpers from a function', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var fn = function() {
         return {
@@ -141,39 +157,40 @@ describe('add helper', function() {
           }
         };
       };
-      var actual = helpers.addHelpers(fn);
-      helpers.should.have.property('foo');
-      helpers.should.have.property('bar');
+
+      var actual = app.helpers(fn);
+      assert(app.cache.hasOwnProperty('foo'));
+      assert(app.cache.hasOwnProperty('bar'));
     });
 
     it('should load helpers from an object', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var obj = require('./fixtures/wrapped/wrapped.js');
-      var actual = helpers.addHelpers(obj);
+      app.helpers(obj);
 
-      helpers.should.have.property('wrapped');
+      assert(app.cache.hasOwnProperty('wrapped'));
     });
 
     it('should load helpers from an object', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var obj = {
         foo: function() {
           return 'hi';
         }
       };
-      var actual = helpers.addHelpers(obj);
-      helpers.should.have.property('foo');
+      app.helpers(obj);
+      assert(app.cache.hasOwnProperty('foo'));
     });
 
     it('should load helpers from a function', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var fn = require('./fixtures/two.js');
-      var actual = helpers.addHelpers({ 'two': fn });
+      app.helpers({ 'two': fn });
 
-      helpers.should.have.property('two');
+      assert(app.cache.hasOwnProperty('two'));
     });
   });
 });
@@ -181,7 +198,7 @@ describe('add helper', function() {
 describe('load functions:', function() {
   describe('.function():', function() {
     it('should load helpers from a function', function() {
-      var helpers = cache();
+      var app = new Cache();
 
       var fn = function() {
         return {
@@ -194,12 +211,12 @@ describe('load functions:', function() {
         };
       };
 
-      var actual = helpers.addHelpers(fn);
+      app.helpers(fn);
 
-      actual.should.have.property('foo');
-      actual.should.have.property('bar');
+      app.cache.should.have.property('foo');
+      app.cache.should.have.property('bar');
 
-      var foo = helpers.getHelper('foo');
+      var foo = app.helper('foo');
       assert.equal(typeof foo, 'function');
     });
   });
