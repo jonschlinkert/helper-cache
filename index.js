@@ -1,7 +1,8 @@
 'use strict';
 
+var util = require('util');
 var loader = require('load-helpers');
-var base = require('base');
+var base = require('cache-base');
 var Base = base.namespace('cache');
 
 /**
@@ -29,13 +30,13 @@ function HelperCache(options) {
  * Inherit `base-methods`
  */
 
-Base.extend(HelperCache);
+util.inherits(HelperCache, Base);
 
 /**
- * Register multiple sync helpers at once.
+ * Load helpers.
  *
  * ```js
- * app.helpers({
+ * app.loader({
  *   foo: function() {},
  *   bar: function() {},
  *   baz: function() {}
@@ -65,8 +66,11 @@ HelperCache.prototype.loader = function(cache, async) {
  */
 
 HelperCache.prototype.helper = function(name, fn) {
+  if (arguments.length === 1) {
+    return this.get(name);
+  }
   if (isObject(name)) {
-    return this.visit('helper', name);
+    return this.helpers.apply(this, arguments);
   }
   this.set(name, fn);
   return this;
@@ -88,6 +92,9 @@ HelperCache.prototype.helper = function(name, fn) {
  */
 
 HelperCache.prototype.helpers = function(helpers) {
+  if (typeof helpers === 'function') {
+    return this.helpers(helpers(this.options));
+  }
   return this.visit('helper', helpers);
 };
 
@@ -95,7 +102,7 @@ HelperCache.prototype.helpers = function(helpers) {
  * Register an async template helper `fn` as `name`.
  *
  * ```js
- * app.helper('uppercase', function(str) {
+ * app.asyncHelper('uppercase', function(str) {
  *   return str.toUpperCase();
  * });
  * ```
@@ -110,7 +117,7 @@ HelperCache.prototype.asyncHelper = function(key, fn) {
     return this.visit('asyncHelper', key);
   }
   fn.async = true;
-  this.set(key, fn);
+  this.helper(key, fn);
   return this;
 };
 
@@ -183,12 +190,3 @@ module.exports = HelperCache;
 function isObject(val) {
   return val && typeof val === 'object' && !Array.isArray(val);
 }
-
-
-var cache = new HelperCache();
-
-cache.helper('foo', function() {
-
-})
-
-console.log(cache)

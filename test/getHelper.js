@@ -11,7 +11,6 @@ var should = require('should');
 var assert = require('assert');
 var cache = require('..');
 
-
 describe('get helpers', function() {
   describe('.getHelper():', function() {
     it('should get helpers from the cache.', function() {

@@ -2,18 +2,20 @@
   "name": "helper-cache",
   "description": "Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.",
   "version": "0.7.2",
-  "homepage": "https://github.com/jonschlinkert/helper-cache",
+  "homepage": "https://github.com/helpers/helper-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "maintainers": [
     "Brian Woodward (https://github.com/doowb)"
   ],
-  "repository": "jonschlinkert/helper-cache",
+  "repository": "helpers/helper-cache",
   "bugs": {
-    "url": "https://github.com/jonschlinkert/helper-cache/issues"
+    "url": "https://github.com/helpers/helper-cache/issues"
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "LICENSE",
+    "README.md"
   ],
   "main": "index.js",
   "engines": {
@@ -23,11 +25,13 @@
     "test": "mocha"
   },
   "dependencies": {
+    "cache-base": "^0.8.4",
     "extend-shallow": "^2.0.1",
-    "load-helpers": "^0.2.8"
+    "load-helpers": "^0.2.11"
   },
   "devDependencies": {
     "globby": "^2.0.0",
+    "gulp-format-md": "^0.1.9",
     "kind-of": "^2.0.0",
     "loader-cache": "^0.4.0",
     "mocha": "*",
@@ -35,20 +39,27 @@
     "should": "*"
   },
   "keywords": [
+    "cache",
     "consolidate",
     "engine",
     "helper",
     "helpers",
     "lo-dash",
     "lodash",
-    "template"
+    "render",
+    "template",
+    "templates"
   ],
   "verb": {
+    "layout": "default",
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
-        "template",
         "engine-cache",
         "handlebars-helpers",
+        "template",
         "template-helpers"
       ]
     }

@@ -1,129 +1,186 @@
-# helper-cache [![NPM version](https://badge.fury.io/js/helper-cache.svg)](http://badge.fury.io/js/helper-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/helper-cache.svg)](https://travis-ci.org/jonschlinkert/helper-cache)
+# helper-cache [![NPM version](https://img.shields.io/npm/v/helper-cache.svg)](https://www.npmjs.com/package/helper-cache) [![Build Status](https://img.shields.io/travis/jonschlinkert/helper-cache.svg)](https://travis-ci.org/jonschlinkert/helper-cache)
 
 > Easily register and get helper functions to be passed to any template engine or node.js application. Methods for both sync and async helpers.
 
-## Install with [npm](npmjs.org)
+## Install
 
-```bash
-npm i helper-cache --save
+Install with [npm](https://www.npmjs.com/):
+
+```sh
+$ npm i helper-cache --save
 ```
 
-## Usage
+## API
 
-### [HelperCache](index.js#L27)
+### [HelperCache](index.js#L19)
 
-Create an instance of `HelperCache`, optionally passing default `options`.
+Create an instance of `HelperCache` with the given `options.`
 
-* `options` **{Object}**: Default options to use.  
-    - `bind` **{Boolean}**: Bind functions to `this`. Defaults to `false`.
-    - `thisArg` **{Boolean}**: The context to use.
-      
+**Params**
+
+* `options` **{Object}**
+
+**Example**
 
 ```js
-var HelperCache = require('helper-cache');
-var helpers = new HelperCache();
+var App = require('helper-cache');
+var app = new App();
 ```
 
-### [.addHelper](index.js#L53)
+### [.loader](index.js#L50)
 
-Register a helper.
+Load helpers.
 
-* `name` **{String}**: The name of the helper.    
-* `fn` **{Function}**: Helper function.    
-* `returns` **{Object}**: Return `this` to enable chaining  
+**Params**
+
+* `helpers` **{Object}**: Array of globs, file paths or key-value pair helper objects.
+* `returns` **{Object}**: Retuns the instance of `HelperCache` for chaining.
+
+**Example**
 
 ```js
-helpers.addHelper('lower', function(str) {
-  return str.toLowerCase();
+app.loader({
+  foo: function() {},
+  bar: function() {},
+  baz: function() {}
 });
 ```
 
-### [.addAsyncHelper](index.js#L106)
+### [.helper](index.js#L68)
 
-Register an async helper.
+Register a sync template helper `fn` as `name`.
 
-* `key` **{String}**: The name of the helper.    
-* `fn` **{Function}**: Helper function.    
-* `returns` **{Object}**: Return `this` to enable chaining  
+**Params**
+
+* `name` **{String}**
+* `fn` **{Function}**
+* `returns` **{Object}**: Retuns the instance of `HelperCache` for chaining.
+
+**Example**
 
 ```js
-helpers.addAsyncHelper('foo', function (str, callback) {
-  callback(null, str + ' foo');
+app.helper('uppercase', function(str) {
+  return str.toUpperCase();
 });
 ```
 
-### [.addHelpers](index.js#L165)
+### [.helpers](index.js#L94)
 
-Load an object of helpers.
+Register multiple sync helpers at once.
 
-* `key` **{String}**: The name of the helper.    
-* `fn` **{Function}**: Helper function.    
-* `returns` **{Object}**: Return `this` to enable chaining.  
+**Params**
+
+* `helpers` **{Object}**: Array of globs, file paths or key-value pair helper objects.
+* `returns` **{Object}**: Retuns the instance of `HelperCache` for chaining.
+
+**Example**
 
 ```js
-helpers.addHelpers({
-  a: function() {},
-  b: function() {},
-  c: function() {},
+app.helpers({
+  foo: function() {},
+  bar: function() {},
+  baz: function() {}
 });
 ```
 
-### [.addAsyncHelpers](index.js#L202)
+### [.asyncHelper](index.js#L115)
 
-Load an object of async helpers.
+Register an async template helper `fn` as `name`.
 
-* `key` **{String}**: The name of the helper.    
-* `fn` **{Function}**: Helper function.    
-* `returns` **{Object}**: Return `this` to enable chaining  
+**Params**
+
+* `name` **{String}**
+* `fn` **{Function}**
+* `returns` **{Object}**: Retuns the instance of `HelperCache` for chaining.
+
+**Example**
 
 ```js
-helpers.addAsyncHelpers({
-  a: function() {},
-  b: function() {},
-  c: function() {},
+app.asyncHelper('uppercase', function(str) {
+  return str.toUpperCase();
 });
 ```
 
-### [.getHelper](index.js#L234)
+### [.asyncHelpers](index.js#L139)
 
-Get a registered helper.
+Register multiple async helpers at once.
 
-* `key` **{String}**: The helper to get.    
-* `returns` **{Object}**: The specified helper. If no `key` is passed, the entire cache is returned.  
+**Params**
+
+* `helpers` **{Object}**: Array of globs, file paths or key-value pair helper objects.
+* `returns` **{Object}**: Retuns the instance of `HelperCache` for chaining.
+
+**Example**
 
 ```js
-helpers.getHelper('foo');
+app.asyncHelpers({
+  foo: function() {},
+  bar: function() {},
+  baz: function() {}
+});
+```
+
+### [.group](index.js#L155)
+
+Namespace a collection of sync helpers on the given `prop`.
+
+**Params**
+
+* `helpers` **{Object|Array}**: Object, array of objects, or glob patterns.
+
+**Example**
+
+```js
+app.group('mdu', require('markdown-utils'));
+// Usage: '<%= mdu.heading("My heading") %>'
+```
+
+### [.group](index.js#L172)
+
+Namespace a collection of async helpers on the given `prop`.
+
+**Params**
+
+* `helpers` **{Object|Array}**: Object, array of objects, or glob patterns.
+
+**Example**
+
+```js
+app.asyncGroup('mdu', require('markdown-utils'));
+// Usage: '<%= mdu.heading("My heading") %>'
 ```
 
 ## Related projects
-* [engine-cache](https://github.com/jonschlinkert/engine-cache): express.js inspired template-engine manager.
-* [handlebars-helpers](https://github.com/assemble/handlebars-helpers): 120+ Handlebars helpers in ~20 categories, for Assemble, YUI, Ghost… [more](https://github.com/assemble/handlebars-helpers)
-* [template-helpers](https://github.com/jonschlinkert/template-helpers): Generic JavaScript helpers that can be used with any template… [more](https://github.com/jonschlinkert/template-helpers)
-* [template](https://github.com/jonschlinkert/template): Render templates from any engine. Make custom template types, use… [more](https://github.com/jonschlinkert/template)
+
+* [engine-cache](https://www.npmjs.com/package/engine-cache): express.js inspired template-engine manager. | [homepage](https://github.com/jonschlinkert/engine-cache)
+* [handlebars-helpers](https://www.npmjs.com/package/handlebars-helpers): 120+ Handlebars helpers in ~20 categories, for Assemble, YUI, Ghost or any Handlebars project. Includes… [more](https://www.npmjs.com/package/handlebars-helpers) | [homepage](https://github.com/assemble/handlebars-helpers)
+* [template](https://www.npmjs.com/package/template): Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template… [more](https://www.npmjs.com/package/template) | [homepage](https://github.com/jonschlinkert/template)
+* [template-helpers](https://www.npmjs.com/package/template-helpers): Generic JavaScript helpers that can be used with any template engine. Handlebars, Lo-Dash, Underscore, or… [more](https://www.npmjs.com/package/template-helpers) | [homepage](https://github.com/jonschlinkert/template-helpers)
 
 ## Running tests
+
 Install dev dependencies:
 
-```bash
-npm i -d && npm test
+```sh
+$ npm i -d && npm test
 ```
 
 ## Contributing
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/helper-cache/issues)
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/helper-cache/issues/new).
 
 ## Author
+
 **Jon Schlinkert**
 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+* [github/jonschlinkert](https://github.com/jonschlinkert)
+* [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
-Copyright (c) 2014-2015 Jon Schlinkert  
-Released under the MIT license
+
+Copyright © 2016 [Jon Schlinkert](https://github.com/jonschlinkert)
+Released under the [MIT license](https://github.com/jonschlinkert/helper-cache/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on April 23, 2015._
-
-
-[load-helpers]: https://github.com/assemble/load-helpers
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on February 11, 2016._
