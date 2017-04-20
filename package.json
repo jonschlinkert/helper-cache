@@ -13,9 +13,7 @@
   },
   "license": "MIT",
   "files": [
-    "index.js",
-    "LICENSE",
-    "README.md"
+    "index.js"
   ],
   "main": "index.js",
   "engines": {
@@ -25,21 +23,19 @@
     "test": "mocha"
   },
   "dependencies": {
-    "cache-base": "^0.8.4",
-    "extend-shallow": "^2.0.1",
-    "load-helpers": "^0.2.11"
+    "collection-visit": "^1.0.0",
+    "define-property": "^0.2.5",
+    "get-value": "^2.0.6",
+    "load-helpers": "^1.0.1"
   },
   "devDependencies": {
-    "globby": "^2.0.0",
-    "gulp-format-md": "^0.1.9",
-    "kind-of": "^2.0.0",
-    "loader-cache": "^0.4.0",
-    "mocha": "*",
-    "object.reduce": "^0.1.7",
-    "should": "*"
+    "gulp-format-md": "^0.1.12",
+    "mocha": "^3.2.0",
+    "should": "^11.2.1"
   },
   "keywords": [
     "cache",
+    "compile",
     "consolidate",
     "engine",
     "helper",
@@ -51,10 +47,17 @@
     "templates"
   ],
   "verb": {
+    "toc": true,
     "layout": "default",
+    "tasks": [
+      "readme"
+    ],
     "plugins": [
       "gulp-format-md"
     ],
+    "lint": {
+      "reflinks": true
+    },
     "related": {
       "list": [
         "engine-cache",
@@ -62,6 +65,11 @@
         "template",
         "template-helpers"
       ]
-    }
+    },
+    "reflinks": [
+      "generate",
+      "generate-helper",
+      "helpers"
+    ]
   }
 }

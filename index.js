@@ -1,9 +1,9 @@
 'use strict';
 
-var util = require('util');
-var loader = require('load-helpers');
-var base = require('cache-base');
-var Base = base.namespace('cache');
+var get = require('get-value');
+var visit = require('collection-visit');
+var define = require('define-property');
+var Loader = require('load-helpers');
 
 /**
  * Create an instance of `HelperCache` with the given `options.`
@@ -20,35 +20,51 @@ function HelperCache(options) {
   if (!(this instanceof HelperCache)) {
     return new HelperCache(options);
   }
-  Base.call(this);
-  this.options = options || {};
-  this.cache = {};
-  this.load = this.loader(this.cache);
+
+  options = options || {};
+  define(this, 'loader', new Loader(options));
+  this.cache = this.loader.cache;
+
+  if (options.async === true) {
+    this.async = true;
+  }
 }
 
 /**
- * Inherit `base-methods`
- */
-
-util.inherits(HelperCache, Base);
-
-/**
- * Load helpers.
+ * Register a helper.
  *
  * ```js
- * app.loader({
- *   foo: function() {},
- *   bar: function() {},
- *   baz: function() {}
+ * app.helper('uppercase', function(str) {
+ *   return str.toUpperCase();
  * });
  * ```
- * @param {Object} `helpers` Array of globs, file paths or key-value pair helper objects.
+ * @param {String} `name`
+ * @param {Function} `fn`
  * @return {Object} Retuns the instance of `HelperCache` for chaining.
  * @api public
  */
 
-HelperCache.prototype.loader = function(cache, async) {
-  return loader(cache, {async: async});
+HelperCache.prototype.addHelper = function(name, fn, options) {
+  this.loader.addHelper.apply(this.loader, arguments);
+  return this;
+};
+
+/**
+ * Get a helper.
+ *
+ * ```js
+ * app.helper('uppercase', function(str) {
+ *   return str.toUpperCase();
+ * });
+ * ```
+ * @param {String} `name`
+ * @param {Function} `fn`
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
+ * @api public
+ */
+
+HelperCache.prototype.getHelper = function(name) {
+  return get(this.loader.cache, name);
 };
 
 /**
@@ -66,13 +82,19 @@ HelperCache.prototype.loader = function(cache, async) {
  */
 
 HelperCache.prototype.helper = function(name, fn) {
-  if (arguments.length === 1) {
-    return this.get(name);
+  if (arguments.length === 1 && typeof name === 'string') {
+    return this.getHelper(name);
   }
   if (isObject(name)) {
     return this.helpers.apply(this, arguments);
   }
-  this.set(name, fn);
+  if (isObject(fn) && typeof fn.async !== 'boolean') {
+    return this.asyncGroup.apply(this, arguments);
+  }
+  if (typeof fn !== 'function') {
+    throw new TypeError('expected a function');
+  }
+  this.addHelper(name, fn);
   return this;
 };
 
@@ -92,10 +114,8 @@ HelperCache.prototype.helper = function(name, fn) {
  */
 
 HelperCache.prototype.helpers = function(helpers) {
-  if (typeof helpers === 'function') {
-    return this.helpers(helpers(this.options));
-  }
-  return this.visit('helper', helpers);
+  this.visit('helper', helpers);
+  return this;
 };
 
 /**
@@ -112,12 +132,17 @@ HelperCache.prototype.helpers = function(helpers) {
  * @api public
  */
 
-HelperCache.prototype.asyncHelper = function(key, fn) {
-  if (isObject(key)) {
-    return this.visit('asyncHelper', key);
+HelperCache.prototype.asyncHelper = function(name, fn) {
+  if (arguments.length === 1 && typeof name === 'string') {
+    return this.helper(name);
   }
-  fn.async = true;
-  this.helper(key, fn);
+  if (isObject(name)) {
+    return this.asyncHelpers.apply(this, arguments);
+  }
+  if (typeof fn !== 'function') {
+    throw new TypeError('expected a function');
+  }
+  this.addHelper(name, toAsync(fn), {async: true});
   return this;
 };
 
@@ -147,13 +172,19 @@ HelperCache.prototype.asyncHelpers = function(helpers) {
  * app.group('mdu', require('markdown-utils'));
  * // Usage: '<%= mdu.heading("My heading") %>'
  * ```
- * @name .group
  * @param {Object|Array} `helpers` Object, array of objects, or glob patterns.
  * @api public
  */
 
 HelperCache.prototype.group = function(prop, helpers) {
-  this.set(prop, helpers);
+  if (!isObject(helpers)) {
+    throw new TypeError('expected an object');
+  }
+  var keys = Object.keys(helpers);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    this.set([prop, key], helpers[key]);
+  }
   return this;
 };
 
@@ -164,16 +195,54 @@ HelperCache.prototype.group = function(prop, helpers) {
  * app.asyncGroup('mdu', require('markdown-utils'));
  * // Usage: '<%= mdu.heading("My heading") %>'
  * ```
- * @name .group
  * @param {Object|Array} `helpers` Object, array of objects, or glob patterns.
  * @api public
  */
 
 HelperCache.prototype.asyncGroup = function(name, helpers) {
-  for (var key in helpers) {
-    helpers[key].async = true;
+  if (typeof helpers === 'function') {
+    return this.asyncGroup(helpers(this.options));
   }
-  this.set(name, helpers);
+
+  if (!isObject(helpers)) {
+    throw new TypeError('expected an object');
+  }
+
+  var keys = Object.keys(helpers);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    this.addHelper(name + '.' + key, toAsync(helpers[key]));
+  }
+  return this;
+};
+
+/**
+ * Load helpers.
+ *
+ * ```js
+ * app.load({
+ *   foo: function() {},
+ *   bar: function() {},
+ *   baz: function() {}
+ * });
+ * ```
+ * @param {Object} `helpers` Array of globs, file paths or key-value pair helper objects.
+ * @return {Object} Retuns the instance of `HelperCache` for chaining.
+ * @api public
+ */
+
+HelperCache.prototype.load = function() {
+  this.loader.load.apply(this.loader, arguments);
+  return this;
+};
+
+HelperCache.prototype.loadGroup = function() {
+  this.loader.loadGroup.apply(this.loader, arguments);
+  return this;
+};
+
+HelperCache.prototype.visit = function(method, val) {
+  visit.apply(null, [this].concat([].slice.call(arguments)));
   return this;
 };
 
@@ -189,4 +258,9 @@ module.exports = HelperCache;
 
 function isObject(val) {
   return val && typeof val === 'object' && !Array.isArray(val);
+}
+
+function toAsync(fn) {
+  fn.async = true;
+  return fn;
 }
